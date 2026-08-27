@@ -1,0 +1,28 @@
+@model IEnumerable<Candidate>
+@{
+    ViewData["Title"] = "Candidates";
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">HR · CANDIDATES</span><h1>Candidate management</h1><p>All registered candidates appear here automatically.</p></div><a asp-action="Create" class="btn btn-primary"><i class="bi bi-person-plus me-2"></i>Add candidate</a></div>
+    <div class="content-card">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead><tr><th>Candidate</th><th>Experience</th><th>Skills</th><th>CVs</th><th>Applications</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td><strong>@c.FullName</strong><br><small>@c.Email</small></td>
+                        <td>@c.YearsOfExperience years</td>
+                        <td class="small">@c.Skills</td>
+                        <td>@c.Cvs.Count</td>
+                        <td>@c.Applications.Count</td>
+                        <td><span class="badge @(c.Status == "Shortlisted" ? "text-bg-success" : c.Status == "Rejected" ? "text-bg-danger" : "text-bg-secondary")">@c.Status</span></td>
+                        <td class="text-end"><a asp-action="Details" asp-route-id="@c.CandidateId" class="btn btn-sm btn-light">View</a><a asp-controller="CV" asp-action="Upload" asp-route-candidateId="@c.CandidateId" class="btn btn-sm btn-outline-primary ms-1">Upload CV</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

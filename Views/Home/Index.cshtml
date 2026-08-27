@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Home";
+}
+<section class="hero">
+    <div class="container py-5">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <span class="eyebrow">RECRUITMENT MANAGEMENT</span>
+                <h1 class="display-4 fw-bold mt-3">Hire smarter. Track everything.</h1>
+                <p class="lead text-secondary mt-3">
+                    A centralized recruitment workspace for vacancies, candidates, CV screening and shortlisting.
+                </p>
+                <div class="d-flex gap-3 mt-4">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-4">Sign in</a>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-outline-dark btn-lg px-4">Candidate sign up</a>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="hero-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold">Recruitment overview</span>
+                        <span class="badge text-bg-success">Live</span>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-6"><div class="metric"><span>Vacancies</span><strong>12</strong></div></div>
+                        <div class="col-6"><div class="metric"><span>Candidates</span><strong>85</strong></div></div>
+                        <div class="col-6"><div class="metric"><span>Shortlisted</span><strong>18</strong></div></div>
+                        <div class="col-6"><div class="metric"><span>Pending</span><strong>42</strong></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row g-4">
+        <div class="col-md-4"><div class="feature-card"><i class="bi bi-briefcase"></i><h4>Vacancies</h4><p>Create and manage recruitment positions in one place.</p></div></div>
+        <div class="col-md-4"><div class="feature-card"><i class="bi bi-file-earmark-person"></i><h4>Candidate CVs</h4><p>Keep candidate records and CV documents centralized.</p></div></div>
+        <div class="col-md-4"><div class="feature-card"><i class="bi bi-stars"></i><h4>AI Screening</h4><p>Compare CV content with vacancy requirements and rank candidates.</p></div></div>
+    </div>
+</section>

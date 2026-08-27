@@ -1,0 +1,19 @@
+@model Vacancy
+@{
+    ViewData["Title"] = "Interview Stages";
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">PB03</span><h1>Interview stages</h1><p>@Model.JobTitle</p></div><a asp-action="Create" asp-route-vacancyId="@Model.VacancyId" class="btn btn-primary">Add stage</a></div>
+    <div class="content-card">
+        @if (!Model.InterviewStages.Any()) { <p class="text-secondary">No stages configured yet.</p> }
+        @foreach (var stage in Model.InterviewStages.OrderBy(x => x.StageOrder))
+        {
+            <div class="stage-row">
+                <div class="stage-number">@stage.StageOrder</div>
+                <div class="flex-grow-1"><strong>@stage.StageName</strong><div class="text-secondary small">@stage.Description</div></div>
+                <a asp-action="Edit" asp-route-id="@stage.InterviewStageId" class="btn btn-sm btn-outline-primary">Edit</a>
+                <form asp-action="Delete" asp-route-id="@stage.InterviewStageId" method="post" class="ms-2">@Html.AntiForgeryToken()<button class="btn btn-sm btn-outline-danger">Delete</button></form>
+            </div>
+        }
+    </div>
+</div>

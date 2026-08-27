@@ -1,0 +1,16 @@
+@model Vacancy
+@{
+    ViewData["Title"] = "Edit Vacancy";
+    ViewData["EditMode"] = true;
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">PB04</span><h1>Edit vacancy position</h1><p>Update the recruitment position.</p></div></div>
+    <div class="content-card">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="VacancyId" />
+            <partial name="_Form" model="Model" />
+            <div class="mt-4"><button class="btn btn-primary">Save changes</button><a asp-action="Index" class="btn btn-light ms-2">Cancel</a></div>
+        </form>
+    </div>
+</div>

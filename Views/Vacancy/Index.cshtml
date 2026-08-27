@@ -1,0 +1,29 @@
+@model IEnumerable<Vacancy>
+@{
+    ViewData["Title"] = "Vacancies";
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">PB02 · PB04</span><h1>Vacancy positions</h1><p>Create and manage open recruitment positions.</p></div><a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Create vacancy</a></div>
+    <div class="content-card">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead><tr><th>Position</th><th>Department</th><th>Location</th><th>Status</th><th>Stages</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong>@item.JobTitle</strong><br><small class="text-secondary">@item.EmploymentType</small></td>
+                        <td>@item.Department</td><td>@item.Location</td>
+                        <td><span class="badge @(item.Status == "Open" ? "text-bg-success" : "text-bg-secondary")">@item.Status</span></td>
+                        <td>@item.InterviewStages.Count</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@item.VacancyId" class="btn btn-sm btn-light">View</a>
+                            <a asp-controller="InterviewStage" asp-action="Index" asp-route-vacancyId="@item.VacancyId" class="btn btn-sm btn-outline-dark">Stages</a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+@model CvUploadViewModel
+@{
+    ViewData["Title"] = "Upload CV";
+    var candidateUpload = User.IsInRole("Candidate");
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">CV PORTAL</span><h1>@(candidateUpload ? "Upload your CV" : "Upload candidate CV")</h1><p>PDF or DOCX up to 10 MB. Text is extracted automatically for AI screening.</p></div></div>
+    <div class="content-card">
+        <form asp-action="Upload" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="CandidateId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <label asp-for="File" class="form-label">CV file</label>
+            <input asp-for="File" class="form-control form-control-lg" accept=".pdf,.docx" />
+            <span asp-validation-for="File" class="text-danger"></span>
+            <button class="btn btn-primary mt-4"><i class="bi bi-cloud-arrow-up me-2"></i>Upload CV</button>
+        </form>
+    </div>
+</div>

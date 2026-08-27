@@ -1,0 +1,34 @@
+@model Vacancy
+@{
+    ViewData["Title"] = "Vacancy Details";
+}
+<div class="container py-4">
+    <div class="page-heading">
+        <div><span class="eyebrow">VACANCY</span><h1>@Model.JobTitle</h1><p>@Model.Department · @Model.Location · @Model.EmploymentType</p></div>
+        <span class="badge @(Model.Status == "Open" ? "text-bg-success" : "text-bg-secondary") align-self-start">@Model.Status</span>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="content-card"><h5>Description</h5><p class="mt-3">@Model.Description</p><h5 class="mt-4">Requirements</h5><p class="mt-3" style="white-space:pre-line">@Model.Requirements</p></div>
+        </div>
+        <div class="col-lg-4">
+            <div class="content-card">
+                <div class="pipeline-row"><span>Salary</span><strong>LKR @Model.Salary.ToString("N0")</strong></div>
+                <div class="pipeline-row"><span>Positions</span><strong>@Model.NumberOfPositions</strong></div>
+                <div class="pipeline-row"><span>Deadline</span><strong>@Model.ApplicationDeadline.ToString("dd MMM yyyy")</strong></div>
+                @if (User.IsInRole("Candidate") && Model.Status == "Open" && Model.ApplicationDeadline.Date >= DateTime.Today)
+                {
+                    <form asp-controller="Application" asp-action="Apply" method="post" class="mt-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="vacancyId" value="@Model.VacancyId" />
+                        <button class="btn btn-primary w-100">Apply with my latest CV</button>
+                    </form>
+                }
+                @if (User.IsInRole("HR"))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.VacancyId" class="btn btn-outline-primary w-100 mt-3">Edit vacancy</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

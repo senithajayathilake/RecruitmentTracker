@@ -1,0 +1,33 @@
+@model HiringManagerDashboardViewModel
+@{
+    ViewData["Title"] = "Hiring Manager Dashboard";
+}
+<div class="container py-4">
+    <div class="page-heading">
+        <div><span class="eyebrow">HIRING MANAGER</span><h1>Hiring manager dashboard</h1><p>Review applicants and make hiring decisions.</p></div>
+    </div>
+    <div class="content-card">
+        <div class="d-flex justify-content-between mb-3"><h5>Candidate applications</h5><span class="badge text-bg-primary">@Model.Applications.Count applications</span></div>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead><tr><th>Candidate</th><th>Vacancy</th><th>AI Match</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var app in Model.Applications)
+                {
+                    <tr>
+                        <td><strong>@app.Candidate?.FullName</strong><br><small>@app.Candidate?.Email</small></td>
+                        <td>@app.Vacancy?.JobTitle</td>
+                        <td><span class="score">@((app.AiScore ?? 0).ToString("0.0"))%</span></td>
+                        <td><span class="badge text-bg-secondary">@app.Status</span></td>
+                        <td><a asp-controller="Application" asp-action="Details" asp-route-id="@app.ApplicationId" class="btn btn-sm btn-light">Review</a></td>
+                    </tr>
+                }
+                @if (!Model.Applications.Any())
+                {
+                    <tr><td colspan="5" class="text-secondary">No applications available yet.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

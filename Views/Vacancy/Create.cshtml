@@ -1,0 +1,14 @@
+@model Vacancy
+@{
+    ViewData["Title"] = "Create Vacancy";
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">PB02</span><h1>Create vacancy position</h1><p>Define the recruitment position and candidate requirements.</p></div></div>
+    <div class="content-card">
+        <form asp-action="Create" method="post" novalidate>
+            @Html.AntiForgeryToken()
+            <partial name="_Form" model="Model" />
+            <div class="mt-4"><button class="btn btn-primary">Create vacancy</button><a asp-action="Index" class="btn btn-light ms-2">Cancel</a></div>
+        </form>
+    </div>
+</div>

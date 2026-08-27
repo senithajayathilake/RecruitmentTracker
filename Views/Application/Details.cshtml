@@ -1,0 +1,48 @@
+@model Application
+@{
+    ViewData["Title"] = "Application Review";
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">APPLICATION REVIEW</span><h1>@Model.Candidate?.FullName</h1><p>@Model.Vacancy?.JobTitle · @Model.Candidate?.Email</p></div><span class="badge text-bg-secondary align-self-start">@Model.Status</span></div>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="content-card">
+                <h5>Candidate</h5>
+                <div class="pipeline-row"><span>Qualification</span><strong>@Model.Candidate?.HighestQualification</strong></div>
+                <div class="pipeline-row"><span>Experience</span><strong>@Model.Candidate?.YearsOfExperience years</strong></div>
+                <div class="pipeline-row"><span>Skills</span><strong>@Model.Candidate?.Skills</strong></div>
+                <div class="pipeline-row"><span>Applied</span><strong>@Model.AppliedDate.ToLocalTime().ToString("dd MMM yyyy HH:mm")</strong></div>
+            </div>
+            <div class="content-card mt-4">
+                <h5>CV</h5>
+                @if (Model.CandidateCv != null)
+                {
+                    <div class="cv-row mt-3"><i class="bi bi-file-earmark-text fs-3"></i><div><strong>@Model.CandidateCv.FileName</strong><div class="small text-secondary">Uploaded @Model.CandidateCv.UploadedDate.ToLocalTime().ToString("dd MMM yyyy")</div></div><a href="@Model.CandidateCv.FilePath" target="_blank" class="btn btn-sm btn-light ms-auto">Open CV</a></div>
+                }
+            </div>
+            <div class="content-card mt-4">
+                <h5>Decision</h5>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    @foreach (var status in new[] { "Under Review", "Shortlisted", "Rejected", "Interview" })
+                    {
+                        <form asp-action="SetStatus" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.ApplicationId" />
+                            <input type="hidden" name="status" value="@status" />
+                            <button class="btn @(status == "Shortlisted" ? "btn-success" : status == "Rejected" ? "btn-outline-danger" : "btn-outline-primary")">@status</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center"><h5>AI CV screening</h5>@if (User.IsInRole("HR")) { <form asp-action="RunAiScreening" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.ApplicationId" /><button class="btn btn-sm btn-primary">Run AI</button></form> }</div>
+                <div class="text-center py-3"><div class="score display-5">@((Model.AiScore ?? 0).ToString("0.0"))%</div><div class="text-secondary">match score</div></div>
+                <div class="pipeline-row"><span>Matched</span><strong>@Model.MatchedSkills</strong></div>
+                <div class="pipeline-row"><span>Missing</span><strong>@Model.MissingSkills</strong></div>
+                <div class="mt-3 small text-secondary">@Model.AiSummary</div>
+            </div>
+        </div>
+    </div>
+</div>

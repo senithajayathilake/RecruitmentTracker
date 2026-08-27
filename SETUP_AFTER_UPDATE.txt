@@ -1,0 +1,27 @@
+RECRUITMENT TRACKER - UPDATED BUILD
+
+1. Extract this ZIP.
+2. Open RecruitmentTracker.sln in Visual Studio 2022.
+3. Build -> Rebuild Solution.
+4. Press F5.
+5. The development LocalDB database is recreated automatically if it is missing
+   the new Applications table or Candidate account link.
+6. Use the demo HR account:
+   Email: hr@recruitment.local
+   Password: Hr12345
+
+Main features:
+- Candidate / HR / HiringManager / Interviewer role-based access
+- Candidate registration automatically creates a Candidate profile
+- HR Candidates page automatically shows registered candidates
+- Candidate CV upload (PDF/DOCX)
+- Vacancy browsing and applications
+- AI CV screening and match scores
+- HR application review
+- HR role access management by registered email
+- Hiring Manager review dashboard
+
+IMPORTANT:
+This is a development build using EnsureCreatedAsync(). If an older database
+schema is detected, RecruitmentTrackerDB is deleted and recreated. Do not use
+this database initialization approach for production data.

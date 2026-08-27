@@ -1,0 +1,22 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Candidate Sign Up";
+}
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <div class="brand-icon"><i class="bi bi-person-plus"></i></div>
+            <h2 class="fw-bold mt-3">Create candidate account</h2>
+            <p class="text-secondary">Register to access recruitment opportunities.</p>
+        </div>
+        <form asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+            <div class="mb-3"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control form-control-lg" /></div>
+            <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control form-control-lg" /></div>
+            <div class="mb-3"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control form-control-lg" /></div>
+            <div class="mb-4"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control form-control-lg" /></div>
+            <button class="btn btn-primary btn-lg w-100">Create account</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+@model CandidateFilterViewModel
+@{
+    ViewData["Title"] = "AI Candidate Screening";
+    var vacancies = ViewBag.Vacancies as List<Vacancy> ?? new List<Vacancy>();
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">AI RECRUITMENT</span><h1>AI CV screening</h1><p>Run the local screening model against a vacancy and compare every candidate's latest CV.</p></div></div>
+    <div class="content-card mb-4">
+        <form asp-action="Index" method="post" class="row align-items-end g-3">
+            @Html.AntiForgeryToken()
+            <div class="col-md-8"><label asp-for="VacancyId" class="form-label">Select vacancy</label><select asp-for="VacancyId" class="form-select"><option value="">Choose...</option>@foreach (var v in vacancies) { <option value="@v.VacancyId">@v.JobTitle — @v.Department</option> }</select></div>
+            <div class="col-md-4"><button class="btn btn-primary w-100"><i class="bi bi-stars me-2"></i>Run AI screening</button></div>
+        </form>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(ViewBag.SelectedVacancy))
+    {
+        <div class="content-card">
+            <div class="d-flex justify-content-between mb-3"><h5>Screening results</h5><span class="badge text-bg-primary">@ViewBag.SelectedVacancy</span></div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead><tr><th>Candidate</th><th>Match</th><th>Matched</th><th>Missing</th><th>Recommendation</th><th>Status</th></tr></thead>
+                    <tbody>
+                    @foreach (var r in Model.Results)
+                    {
+                        <tr>
+                            <td><strong>@r.CandidateName</strong><br><small>@r.Email</small></td>
+                            <td><div class="score">@r.Score.ToString("0.0")%</div></td>
+                            <td class="small">@r.MatchedSkills</td>
+                            <td class="small">@r.MissingSkills</td>
+                            <td><span class="badge text-bg-primary">@r.Recommendation</span></td>
+                            <td><span class="badge text-bg-secondary">@r.Status</span></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

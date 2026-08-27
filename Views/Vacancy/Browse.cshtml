@@ -1,0 +1,24 @@
+@model IEnumerable<Vacancy>
+@{
+    ViewData["Title"] = "Available Jobs";
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">CANDIDATE JOB BOARD</span><h1>Available vacancies</h1><p>Find a role and apply using your latest uploaded CV.</p></div></div>
+    <div class="row g-4">
+        @foreach (var vacancy in Model)
+        {
+            <div class="col-lg-6">
+                <div class="content-card h-100">
+                    <div class="d-flex justify-content-between"><div><h4>@vacancy.JobTitle</h4><div class="text-secondary">@vacancy.Department · @vacancy.Location</div></div><span class="badge text-bg-success">@vacancy.Status</span></div>
+                    <p class="mt-3">@vacancy.Description</p>
+                    <div class="small text-secondary mb-3">@(vacancy.EmploymentType) · Salary LKR @vacancy.Salary.ToString("N0") · Deadline @vacancy.ApplicationDeadline.ToString("dd MMM yyyy")</div>
+                    <a asp-action="Details" asp-route-id="@vacancy.VacancyId" class="btn btn-primary">View & apply</a>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="col-12"><div class="content-card"><p class="text-secondary mb-0">No open vacancies are currently available.</p></div></div>
+        }
+    </div>
+</div>

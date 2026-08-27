@@ -1,0 +1,19 @@
+@model InterviewStage
+@{
+    ViewData["Title"] = "Edit Interview Stage";
+}
+<div class="container py-4">
+    <div class="page-heading"><div><span class="eyebrow">PB03</span><h1>Edit interview stage</h1></div></div>
+    <div class="content-card">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="InterviewStageId" />
+            <input type="hidden" asp-for="VacancyId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div class="mb-3"><label asp-for="StageName" class="form-label"></label><input asp-for="StageName" class="form-control" /></div>
+            <div class="mb-3"><label asp-for="StageOrder" class="form-label"></label><input asp-for="StageOrder" class="form-control" /></div>
+            <div class="mb-4"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control"></textarea></div>
+            <button class="btn btn-primary">Save changes</button>
+        </form>
+    </div>
+</div>
