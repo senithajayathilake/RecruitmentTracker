@@ -1,94 +1,62 @@
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Careers";
 }
 
-<section class="hf-home">
+<section class="career-portal">
+    <div class="career-grid"></div>
 
-    <div class="hf-left">
+    <header class="career-topbar">
+        <a class="career-brand" asp-controller="Home" asp-action="Index">
+            <span class="career-brand-mark">H</span>
+            <span class="career-brand-copy">
+                <strong>HIGHER FLOW</strong>
+                <small>Careers</small>
+            </span>
+        </a>
+        <div class="career-top-actions">
+            <span class="career-portal-label">RECRUITMENT PLATFORM</span>
+            <a asp-controller="Account" asp-action="Login" class="career-test-pill">
+                <span class="career-toggle-dot"></span>
+                STAFF LOGIN
+            </a>
+        </div>
+    </header>
 
-        <div class="hf-content">
+    <div class="career-shell">
+        <div class="career-copy">
+            <div class="career-kicker"><span></span> BUILD WHAT MATTERS</div>
+            <h1>Find your next<br /><em>opportunity.</em></h1>
+            <p>Join a team that values clear thinking, meaningful work, and the people behind every idea.</p>
 
-            <div class="hf-logo">
-                <div class="hf-logo-icon">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-
-                <span>Higher Flow</span>
+            <div class="career-values">
+                <div><b>01</b><span>PURPOSE-LED<br />WORK</span></div>
+                <div><b>02</b><span>ROOM TO<br />GROW</span></div>
+                <div><b>03</b><span>PEOPLE<br />FIRST</span></div>
             </div>
-
-            <div class="hf-welcome">
-
-                <span class="hf-eyebrow">
-                    RECRUITMENT MANAGEMENT
-                </span>
-
-                <h1>
-                    Build your team.<br />
-                    <span>Better.</span>
-                </h1>
-
-                <p>
-                    A simple and smarter way to manage vacancies,
-                    candidates and the recruitment process.
-                </p>
-
-                <div class="hf-buttons">
-
-                    <a asp-controller="Account"
-                       asp-action="Login"
-                       class="btn hf-btn-primary">
-
-                        Sign in
-
-                    </a>
-
-                    <a asp-controller="Account"
-                       asp-action="Register"
-                       class="btn hf-btn-secondary">
-
-                        Candidate Sign Up
-
-                    </a>
-
-                </div>
-
-            </div>
-
-            <div class="hf-footer-text">
-                Recruitment made simple.
-            </div>
-
         </div>
 
-    </div>
+        <div class="career-action-card">
+            <span class="career-card-kicker">APPLICATION</span>
+            <h2>Start your application</h2>
+            <p>Browse open roles, create your candidate profile and share your CV. It only takes a few minutes.</p>
 
-
-    <div class="hf-right">
-
-        <div class="hf-shape hf-shape-one"></div>
-
-        <div class="hf-shape hf-shape-two"></div>
-
-        <div class="hf-shape hf-shape-three"></div>
-
-        <div class="hf-blue-content">
-
-            <div class="hf-blue-circle">
-                <i class="bi bi-person-check"></i>
+            <div class="career-card-block">
+                <label>Looking for an opportunity?</label>
+                <a asp-controller="Account" asp-action="Register" class="btn career-primary-btn w-100">
+                    Create candidate account <i class="bi bi-arrow-up-right ms-2"></i>
+                </a>
             </div>
 
-            <h2>
-                Smarter hiring.<br />
-                Better teams.
-            </h2>
+            <div class="career-divider"><span>or</span></div>
 
-            <p>
-                Connect candidates with opportunities
-                and make recruitment easier.
-            </p>
+            <a asp-controller="Account" asp-action="Login" class="btn career-secondary-btn w-100">
+                Sign in to your account
+            </a>
 
+            <div class="career-card-footer">
+                <i class="bi bi-shield-check"></i>
+                Your information is only accessible to the recruitment team.
+            </div>
         </div>
-
     </div>
-
 </section>

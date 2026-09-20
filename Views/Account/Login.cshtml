@@ -2,13 +2,17 @@
 @{
     ViewData["Title"] = "Login";
 }
-<div class="auth-wrap">
-    <div class="auth-card">
-        <div class="text-center mb-4">
-            <div class="brand-icon"><i class="bi bi-people-fill"></i></div>
-            <h2 class="fw-bold mt-3">Welcome back</h2>
-            <p class="text-secondary">Sign in to RecruitTrack</p>
-        </div>
+<div class="auth-scene">
+    <div class="auth-grid"></div>
+    <a asp-controller="Home" asp-action="Index" class="auth-brand">
+        <span class="career-brand-mark">H</span>
+        <span class="career-brand-copy"><strong>HIGHER FLOW</strong><small>Recruitment</small></span>
+    </a>
+
+    <div class="auth-card altrium-auth-card">
+        <span class="career-card-kicker">WELCOME BACK</span>
+        <h2>Sign in</h2>
+        <p class="auth-intro">Access your recruitment workspace.</p>
         <form asp-action="Login" method="post">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
@@ -26,11 +30,9 @@
                 <input asp-for="RememberMe" class="form-check-input" />
                 <label asp-for="RememberMe" class="form-check-label">Remember me</label>
             </div>
-            <button class="btn btn-primary btn-lg w-100">Login</button>
+            <button class="btn career-primary-btn btn-lg w-100">Sign in <i class="bi bi-arrow-up-right ms-2"></i></button>
         </form>
-        <p class="text-center mt-4 mb-0 text-secondary">Candidate? <a asp-action="Register">Create an account</a></p>
-        <div class="demo-box mt-4">
-            <strong>Demo HR:</strong> hr@recruitment.local / Hr12345
-        </div>
+        <p class="text-center mt-4 mb-0 auth-switch">Candidate? <a asp-action="Register">Create an account</a></p>
+        <div class="demo-box mt-4"><strong>Demo HR:</strong> hr@recruitment.local / Hr12345</div>
     </div>
 </div>

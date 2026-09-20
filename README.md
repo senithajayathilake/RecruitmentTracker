@@ -176,3 +176,6 @@ Hiring Manager:
 ## Security note
 
 CV files are stored under `wwwroot/uploads/cvs` in this prototype. For a production system, CVs should be stored in protected/private storage and accessed through authorized endpoints.
+
+## Black + Gold Glass UI refresh
+This build applies the black/yellow glassmorphism visual system across the authenticated experience (dashboards, vacancies, candidates, interviews, comparison, reports, forms and tables), not only the public landing pages. The shared layout now renders ambient grid/orb/ring background decoration and `site.css` globally skins existing Bootstrap/Razor components with translucent glass panels and amber accents.

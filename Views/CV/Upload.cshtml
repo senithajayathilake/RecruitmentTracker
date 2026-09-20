@@ -3,17 +3,33 @@
     ViewData["Title"] = "Upload CV";
     var candidateUpload = User.IsInRole("Candidate");
 }
-<div class="container py-4">
-    <div class="page-heading"><div><span class="eyebrow">CV PORTAL</span><h1>@(candidateUpload ? "Upload your CV" : "Upload candidate CV")</h1><p>PDF or DOCX up to 10 MB. Text is extracted automatically for AI screening.</p></div></div>
-    <div class="content-card">
-        <form asp-action="Upload" method="post" enctype="multipart/form-data">
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="CandidateId" />
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-            <label asp-for="File" class="form-label">CV file</label>
-            <input asp-for="File" class="form-control form-control-lg" accept=".pdf,.docx" />
-            <span asp-validation-for="File" class="text-danger"></span>
-            <button class="btn btn-primary mt-4"><i class="bi bi-cloud-arrow-up me-2"></i>Upload CV</button>
-        </form>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="application-card">
+                <span class="career-card-kicker">APPLICATION</span>
+                <h1>@(candidateUpload ? "Submit your CV" : "Upload candidate CV")</h1>
+                <p>Share a PDF or DOCX up to 10 MB. The document is securely stored and automatically prepared for screening.</p>
+
+                <form asp-action="Upload" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="CandidateId" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <label asp-for="File" class="upload-dropzone">
+                        <span class="upload-icon"><i class="bi bi-upload"></i></span>
+                        <strong>Drop your CV here</strong>
+                        <span>or</span>
+                        <u>Choose file</u>
+                        <small>PDF OR DOCX · MAXIMUM 10 MB</small>
+                        <input asp-for="File" accept=".pdf,.docx" />
+                    </label>
+                    <span asp-validation-for="File" class="text-danger small"></span>
+
+                    <button class="btn career-primary-btn btn-lg w-100 mt-4">Submit CV <i class="bi bi-arrow-up-right ms-2"></i></button>
+                    <div class="secure-note"><i class="bi bi-shield-check"></i> Your CV is securely stored and only accessible to the recruitment team.</div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
