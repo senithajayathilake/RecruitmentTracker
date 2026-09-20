@@ -895,3 +895,16 @@ body {
         min-height: 340px;
     }
 }
+
+
+/* =========================================================
+   NOTIFICATIONS
+========================================================= */
+.notification-row {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.notification-row:last-child {
+    border-bottom: 0;
+}

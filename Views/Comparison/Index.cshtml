@@ -1,0 +1,76 @@
+@model CandidateComparisonViewModel
+@{
+    ViewData["Title"] = "Compare Candidates";
+}
+<div class="container py-4">
+    <div class="page-heading">
+        <div>
+            <span class="eyebrow">FAIR COMPARISON</span>
+            <h1>Compare candidates</h1>
+            <p>Compare candidates for the same vacancy using consistent evidence.</p>
+        </div>
+    </div>
+
+    <div class="content-card mb-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-9">
+                <label class="form-label">Vacancy</label>
+                <select name="vacancyId" class="form-select">
+                    @foreach (var vacancy in Model.Vacancies)
+                    {
+                        <option value="@vacancy.VacancyId" selected="@(Model.SelectedVacancy?.VacancyId == vacancy.VacancyId ? "selected" : null)">
+                            @vacancy.JobTitle — @vacancy.Department
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3"><button class="btn btn-primary w-100">Compare</button></div>
+        </form>
+    </div>
+
+    @if (Model.SelectedVacancy != null)
+    {
+        <div class="content-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div><h5 class="mb-1">@Model.SelectedVacancy.JobTitle</h5><p class="small text-secondary mb-0">AI score is supporting evidence; interview scores use the same 1–5 rubric for each candidate.</p></div>
+                <span class="badge text-bg-primary">@Model.Rows.Count candidates</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Experience</th>
+                            <th>AI match</th>
+                            <th>Interview avg.</th>
+                            <th>Latest recommendation</th>
+                            <th>Current stage</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <tr>
+                            <td><strong>@row.CandidateName</strong><br><small>@row.Email</small><br><small class="text-secondary">@row.Skills</small></td>
+                            <td>@row.YearsOfExperience years</td>
+                            <td><span class="score">@row.AiScore.ToString("0.0")%</span></td>
+                            <td>@(row.InterviewAverage.HasValue ? $"{row.InterviewAverage:0.0} / 5" : "Pending")</td>
+                            <td>@row.LatestRecommendation</td>
+                            <td>@row.CurrentStage</td>
+                            <td><span class="badge text-bg-secondary">@row.Status</span></td>
+                            <td><a asp-controller="Application" asp-action="Details" asp-route-id="@row.ApplicationId" class="btn btn-sm btn-light">Review</a></td>
+                        </tr>
+                    }
+                    @if (!Model.Rows.Any())
+                    {
+                        <tr><td colspan="8" class="text-secondary">No applications for this vacancy yet.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

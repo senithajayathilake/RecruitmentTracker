@@ -1,0 +1,70 @@
+@model InterviewFeedbackViewModel
+@{
+    ViewData["Title"] = "Interview Feedback";
+}
+<div class="container py-4">
+    <div class="page-heading">
+        <div>
+            <span class="eyebrow">INTERVIEWER · FEEDBACK</span>
+            <h1>Structured candidate feedback</h1>
+            <p>Use the same 1–5 criteria for every candidate so comparisons are consistent.</p>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <form asp-action="Feedback" method="post">
+            @Html.AntiForgeryToken()
+            <input asp-for="InterviewId" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="TechnicalScore" class="form-label"></label>
+                    <select asp-for="TechnicalScore" class="form-select">
+                        @for (var i = 1; i <= 5; i++) { <option value="@i">@i / 5</option> }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="CommunicationScore" class="form-label"></label>
+                    <select asp-for="CommunicationScore" class="form-select">
+                        @for (var i = 1; i <= 5; i++) { <option value="@i">@i / 5</option> }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ProblemSolvingScore" class="form-label"></label>
+                    <select asp-for="ProblemSolvingScore" class="form-select">
+                        @for (var i = 1; i <= 5; i++) { <option value="@i">@i / 5</option> }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="CultureFitScore" class="form-label"></label>
+                    <select asp-for="CultureFitScore" class="form-select">
+                        @for (var i = 1; i <= 5; i++) { <option value="@i">@i / 5</option> }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Recommendation" class="form-label"></label>
+                    <select asp-for="Recommendation" class="form-select">
+                        <option>Strong Hire</option>
+                        <option>Hire</option>
+                        <option>Hold</option>
+                        <option>Reject</option>
+                        <option>Strong Reject</option>
+                    </select>
+                    <span asp-validation-for="Recommendation" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Comments" class="form-label"></label>
+                    <textarea asp-for="Comments" rows="6" class="form-control"
+                              placeholder="Evidence-based comments: strengths, concerns and examples from the interview"></textarea>
+                    <span asp-validation-for="Comments" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button class="btn btn-primary">Submit feedback</button>
+                <a asp-action="Details" asp-route-id="@Model.InterviewId" class="btn btn-light ms-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

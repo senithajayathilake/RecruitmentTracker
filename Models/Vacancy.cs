@@ -33,6 +33,9 @@ public class Vacancy
     [DataType(DataType.Date)]
     public DateTime ApplicationDeadline { get; set; } = DateTime.Today.AddDays(30);
 
+    [Display(Name = "Require feedback before advancing")]
+    public bool RequireFeedbackBeforeAdvance { get; set; } = true;
+
     public string Status { get; set; } = "Open";
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 

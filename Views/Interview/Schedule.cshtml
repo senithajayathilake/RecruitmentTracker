@@ -1,0 +1,87 @@
+@model InterviewScheduleViewModel
+@{
+    ViewData["Title"] = "Schedule Interview";
+    var application = ViewBag.Application as Application;
+    var stages = ViewBag.Stages as List<InterviewStage> ?? new List<InterviewStage>();
+    var interviewers = ViewBag.Interviewers as List<ApplicationUser> ?? new List<ApplicationUser>();
+}
+<div class="container py-4">
+    <div class="page-heading">
+        <div>
+            <span class="eyebrow">HR · INTERVIEW</span>
+            <h1>Schedule interview</h1>
+            <p>@application?.Candidate?.FullName · @application?.Vacancy?.JobTitle</p>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <form asp-action="Schedule" method="post">
+            @Html.AntiForgeryToken()
+            <input asp-for="ApplicationId" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="InterviewStageId" class="form-label"></label>
+                    <select asp-for="InterviewStageId" class="form-select">
+                        @foreach (var stage in stages)
+                        {
+                            <option value="@stage.InterviewStageId">@stage.StageOrder. @stage.StageName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="InterviewStageId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="InterviewerId" class="form-label"></label>
+                    <select asp-for="InterviewerId" class="form-select">
+                        <option value="">Choose interviewer...</option>
+                        @foreach (var person in interviewers)
+                        {
+                            <option value="@person.Id">@person.FullName (@person.Email)</option>
+                        }
+                    </select>
+                    <span asp-validation-for="InterviewerId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ScheduledAt" class="form-label"></label>
+                    <input asp-for="ScheduledAt" type="datetime-local" class="form-control"
+                           value="@Model.ScheduledAt.ToString("yyyy-MM-ddTHH:mm")" />
+                    <span asp-validation-for="ScheduledAt" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="DurationMinutes" class="form-label"></label>
+                    <input asp-for="DurationMinutes" type="number" min="15" max="480" class="form-control" />
+                    <span asp-validation-for="DurationMinutes" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="LocationOrMeetingLink" class="form-label"></label>
+                    <input asp-for="LocationOrMeetingLink" class="form-control" placeholder="Meeting Room 2 or Teams/Zoom link" />
+                    <span asp-validation-for="LocationOrMeetingLink" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Notes" class="form-label"></label>
+                    <textarea asp-for="Notes" rows="4" class="form-control" placeholder="Optional instructions for the interviewer"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger small"></span>
+                </div>
+            </div>
+
+            @if (application?.Vacancy?.RequireFeedbackBeforeAdvance == true)
+            {
+                <div class="alert alert-info mt-4 mb-0">
+                    <i class="bi bi-lock me-2"></i>
+                    This vacancy requires feedback from the previous stage before a candidate can advance.
+                </div>
+            }
+
+            <div class="mt-4">
+                <button class="btn btn-primary">Schedule interview</button>
+                <a asp-controller="Application" asp-action="Details" asp-route-id="@Model.ApplicationId" class="btn btn-light ms-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

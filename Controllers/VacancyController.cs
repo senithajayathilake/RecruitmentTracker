@@ -97,6 +97,7 @@ public class VacancyController : Controller
         vacancy.Requirements = model.Requirements;
         vacancy.NumberOfPositions = model.NumberOfPositions;
         vacancy.ApplicationDeadline = model.ApplicationDeadline;
+        vacancy.RequireFeedbackBeforeAdvance = model.RequireFeedbackBeforeAdvance;
         vacancy.Status = model.Status;
 
         await _db.SaveChangesAsync();

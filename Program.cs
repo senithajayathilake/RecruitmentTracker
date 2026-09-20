@@ -31,6 +31,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ICvTextExtractor, CvTextExtractor>();
 builder.Services.AddScoped<ICandidateFilterService, CandidateFilterService>();
 builder.Services.AddScoped<IAiCvScreeningService, AiCvScreeningService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var app = builder.Build();
 
@@ -54,8 +55,9 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    // Development database bootstrap. If the old database is missing a table
-    // introduced by this version, recreate it once with the complete schema.
+    // This student prototype uses EnsureCreated instead of migrations.
+    // When a previous local database does not contain the final schema,
+    // recreate it once so the application starts with all required tables.
     if (await db.Database.CanConnectAsync())
     {
         var connection = db.Database.GetDbConnection();
@@ -66,12 +68,27 @@ using (var scope = app.Services.CreateScope())
             SELECT
                 CASE WHEN OBJECT_ID(N'[dbo].[AspNetRoles]', N'U') IS NULL THEN 1 ELSE 0 END,
                 CASE WHEN OBJECT_ID(N'[dbo].[Applications]', N'U') IS NULL THEN 1 ELSE 0 END,
-                CASE WHEN COL_LENGTH(N'[dbo].[Candidates]', N'ApplicationUserId') IS NULL THEN 1 ELSE 0 END";
+                CASE WHEN OBJECT_ID(N'[dbo].[Interviews]', N'U') IS NULL THEN 1 ELSE 0 END,
+                CASE WHEN OBJECT_ID(N'[dbo].[InterviewFeedbacks]', N'U') IS NULL THEN 1 ELSE 0 END,
+                CASE WHEN OBJECT_ID(N'[dbo].[Notifications]', N'U') IS NULL THEN 1 ELSE 0 END,
+                CASE WHEN COL_LENGTH(N'[dbo].[Candidates]', N'ApplicationUserId') IS NULL THEN 1 ELSE 0 END,
+                CASE WHEN COL_LENGTH(N'[dbo].[Applications]', N'CurrentInterviewStageId') IS NULL THEN 1 ELSE 0 END,
+                CASE WHEN COL_LENGTH(N'[dbo].[Vacancies]', N'RequireFeedbackBeforeAdvance') IS NULL THEN 1 ELSE 0 END";
 
         await using var reader = await command.ExecuteReaderAsync();
         var needsRecreate = false;
+
         if (await reader.ReadAsync())
-            needsRecreate = reader.GetInt32(0) == 1 || reader.GetInt32(1) == 1 || reader.GetInt32(2) == 1;
+        {
+            for (var i = 0; i < 8; i++)
+            {
+                if (reader.GetInt32(i) == 1)
+                {
+                    needsRecreate = true;
+                    break;
+                }
+            }
+        }
 
         await reader.CloseAsync();
         await connection.CloseAsync();

@@ -1,0 +1,62 @@
+@model IEnumerable<Interview>
+@{
+    ViewData["Title"] = "Interviews";
+}
+<div class="container py-4">
+    <div class="page-heading">
+        <div>
+            <span class="eyebrow">INTERVIEWS</span>
+            <h1>Interview schedule</h1>
+            <p>Track scheduled, completed and cancelled interviews.</p>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Vacancy</th>
+                        <th>Stage</th>
+                        <th>Interviewer</th>
+                        <th>Date / time</th>
+                        <th>Status</th>
+                        <th>Feedback</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong>@item.Application?.Candidate?.FullName</strong></td>
+                        <td>@item.Application?.Vacancy?.JobTitle</td>
+                        <td>@item.InterviewStage?.StageName</td>
+                        <td>@item.Interviewer?.FullName</td>
+                        <td>@item.ScheduledAt.ToString("dd MMM yyyy HH:mm")</td>
+                        <td><span class="badge text-bg-secondary">@item.Status</span></td>
+                        <td>
+                            @if (item.Feedback != null)
+                            {
+                                <span class="badge text-bg-success">@item.Feedback.AverageScore / 5</span>
+                            }
+                            else
+                            {
+                                <span class="text-secondary small">Pending</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@item.InterviewId" class="btn btn-sm btn-light">View</a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="8" class="text-secondary">No interviews scheduled yet.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

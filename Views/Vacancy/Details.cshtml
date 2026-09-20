@@ -9,12 +9,42 @@
     </div>
     <div class="row g-4">
         <div class="col-lg-8">
-            <div class="content-card"><h5>Description</h5><p class="mt-3">@Model.Description</p><h5 class="mt-4">Requirements</h5><p class="mt-3" style="white-space:pre-line">@Model.Requirements</p></div>
+            <div class="content-card">
+                <h5>Description</h5>
+                <p class="mt-3">@Model.Description</p>
+                <h5 class="mt-4">Requirements</h5>
+                <p class="mt-3" style="white-space:pre-line">@Model.Requirements</p>
+            </div>
+
+            <div class="content-card mt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5>Interview process</h5>
+                    @if (User.IsInRole("HR"))
+                    {
+                        <a asp-controller="InterviewStage" asp-action="Index" asp-route-vacancyId="@Model.VacancyId" class="btn btn-sm btn-outline-primary">Configure stages</a>
+                    }
+                </div>
+                @if (!Model.InterviewStages.Any())
+                {
+                    <p class="text-secondary mt-3 mb-0">No interview stages configured yet.</p>
+                }
+                @foreach (var stage in Model.InterviewStages.OrderBy(s => s.StageOrder))
+                {
+                    <div class="stage-row">
+                        <div class="stage-number">@stage.StageOrder</div>
+                        <div><strong>@stage.StageName</strong><div class="small text-secondary">@stage.Description</div></div>
+                    </div>
+                }
+                <div class="small text-secondary mt-3">
+                    Feedback gate: <strong>@(Model.RequireFeedbackBeforeAdvance ? "Enabled" : "Disabled")</strong>
+                </div>
+            </div>
         </div>
         <div class="col-lg-4">
             <div class="content-card">
                 <div class="pipeline-row"><span>Salary</span><strong>LKR @Model.Salary.ToString("N0")</strong></div>
                 <div class="pipeline-row"><span>Positions</span><strong>@Model.NumberOfPositions</strong></div>
+                <div class="pipeline-row"><span>Applications</span><strong>@Model.Applications.Count</strong></div>
                 <div class="pipeline-row"><span>Deadline</span><strong>@Model.ApplicationDeadline.ToString("dd MMM yyyy")</strong></div>
                 @if (User.IsInRole("Candidate") && Model.Status == "Open" && Model.ApplicationDeadline.Date >= DateTime.Today)
                 {

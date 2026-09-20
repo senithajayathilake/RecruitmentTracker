@@ -4,7 +4,7 @@
 }
 <div class="container py-4">
     <div class="page-heading">
-        <div><span class="eyebrow">HR OFFICER</span><h1>Recruitment dashboard</h1><p>Manage candidates, vacancies, AI screening and user access.</p></div>
+        <div><span class="eyebrow">HR OFFICER</span><h1>Recruitment dashboard</h1><p>Manage positions, candidates, interviews, feedback and hiring decisions.</p></div>
         <a asp-controller="Vacancy" asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Create vacancy</a>
     </div>
 
@@ -12,40 +12,66 @@
         <div class="col-md-3"><div class="stat-card"><span>Vacancies</span><strong>@Model.VacancyCount</strong><i class="bi bi-briefcase"></i></div></div>
         <div class="col-md-3"><div class="stat-card"><span>Candidates</span><strong>@Model.CandidateCount</strong><i class="bi bi-people"></i></div></div>
         <div class="col-md-3"><div class="stat-card"><span>Applications</span><strong>@Model.ApplicationCount</strong><i class="bi bi-send"></i></div></div>
-        <div class="col-md-3"><div class="stat-card"><span>Shortlisted</span><strong>@Model.ShortlistedCount</strong><i class="bi bi-star"></i></div></div>
+        <div class="col-md-3"><div class="stat-card"><span>Upcoming interviews</span><strong>@Model.UpcomingInterviewCount</strong><i class="bi bi-calendar-event"></i></div></div>
     </div>
 
-    <div class="content-card mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div><h5 class="mb-1">Candidate & application feed</h5><p class="small text-secondary mb-0">Candidate registrations and applications appear here automatically.</p></div>
-            <a asp-controller="Candidate" asp-action="Index" class="btn btn-sm btn-outline-primary">All candidates</a>
-        </div>
-        <div class="table-responsive">
-            <table class="table align-middle">
-                <thead><tr><th>Candidate</th><th>Vacancy</th><th>AI Match</th><th>Status</th><th></th></tr></thead>
-                <tbody>
-                @foreach (var app in Model.RecentApplications)
-                {
-                    <tr>
-                        <td><strong>@app.Candidate?.FullName</strong><br><small>@app.Candidate?.Email</small></td>
-                        <td>@app.Vacancy?.JobTitle</td>
-                        <td><span class="score">@((app.AiScore ?? 0).ToString("0.0"))%</span></td>
-                        <td><span class="badge text-bg-secondary">@app.Status</span></td>
-                        <td><a asp-controller="Application" asp-action="Details" asp-route-id="@app.ApplicationId" class="btn btn-sm btn-light">Review</a></td>
-                    </tr>
-                }
-                @if (!Model.RecentApplications.Any())
-                {
-                    <tr><td colspan="5" class="text-secondary">No applications yet. New candidate registrations are already available under Candidates.</td></tr>
-                }
-                </tbody>
-            </table>
-        </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-3"><a class="content-card d-block text-decoration-none text-reset h-100" asp-controller="Candidate" asp-action="Index"><i class="bi bi-person-lines-fill fs-2"></i><h5 class="mt-2">Candidates</h5><p class="text-secondary mb-0">Profiles, CVs and applications.</p></a></div>
+        <div class="col-md-3"><a class="content-card d-block text-decoration-none text-reset h-100" asp-controller="Interview" asp-action="Index"><i class="bi bi-calendar2-check fs-2"></i><h5 class="mt-2">Interviews</h5><p class="text-secondary mb-0">Schedule and track interview stages.</p></a></div>
+        <div class="col-md-3"><a class="content-card d-block text-decoration-none text-reset h-100" asp-controller="Comparison" asp-action="Index"><i class="bi bi-columns-gap fs-2"></i><h5 class="mt-2">Compare</h5><p class="text-secondary mb-0">Compare candidates consistently.</p></a></div>
+        <div class="col-md-3"><a class="content-card d-block text-decoration-none text-reset h-100" asp-controller="Reports" asp-action="Index"><i class="bi bi-bar-chart-line fs-2"></i><h5 class="mt-2">Reports</h5><p class="text-secondary mb-0">Management metrics and CSV export.</p></a></div>
     </div>
 
     <div class="row g-4">
-        <div class="col-md-4"><a class="content-card d-block text-decoration-none text-reset h-100" asp-controller="Candidate" asp-action="Index"><i class="bi bi-person-lines-fill fs-2"></i><h5 class="mt-2">Candidates</h5><p class="text-secondary mb-0">Every registered candidate is automatically added to this page.</p></a></div>
-        <div class="col-md-4"><a class="content-card d-block text-decoration-none text-reset h-100" asp-controller="CandidateFilter" asp-action="Index"><i class="bi bi-stars fs-2"></i><h5 class="mt-2">AI Screening</h5><p class="text-secondary mb-0">Compare uploaded CVs with vacancy requirements.</p></a></div>
-        <div class="col-md-4"><a class="content-card d-block text-decoration-none text-reset h-100" asp-controller="RoleManagement" asp-action="Index"><i class="bi bi-shield-lock fs-2"></i><h5 class="mt-2">Manage Role Access</h5><p class="text-secondary mb-0">Give role access to registered email accounts.</p></a></div>
+        <div class="col-lg-7">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div><h5 class="mb-1">Candidate & application feed</h5><p class="small text-secondary mb-0">Latest applications and AI screening results.</p></div>
+                    <a asp-controller="Candidate" asp-action="Index" class="btn btn-sm btn-outline-primary">All candidates</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead><tr><th>Candidate</th><th>Vacancy</th><th>AI Match</th><th>Status</th><th></th></tr></thead>
+                        <tbody>
+                        @foreach (var app in Model.RecentApplications)
+                        {
+                            <tr>
+                                <td><strong>@app.Candidate?.FullName</strong><br><small>@app.Candidate?.Email</small></td>
+                                <td>@app.Vacancy?.JobTitle</td>
+                                <td><span class="score">@((app.AiScore ?? 0).ToString("0.0"))%</span></td>
+                                <td><span class="badge text-bg-secondary">@app.Status</span></td>
+                                <td><a asp-controller="Application" asp-action="Details" asp-route-id="@app.ApplicationId" class="btn btn-sm btn-light">Review</a></td>
+                            </tr>
+                        }
+                        @if (!Model.RecentApplications.Any())
+                        {
+                            <tr><td colspan="5" class="text-secondary">No applications yet.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Upcoming interviews</h5>
+                    <span class="badge text-bg-primary">@Model.UpcomingInterviews.Count</span>
+                </div>
+                @foreach (var interview in Model.UpcomingInterviews)
+                {
+                    <div class="border rounded p-3 mb-2">
+                        <strong>@interview.Application?.Candidate?.FullName</strong>
+                        <div class="small text-secondary">@interview.Application?.Vacancy?.JobTitle · @interview.InterviewStage?.StageName</div>
+                        <div class="small mt-1">@interview.ScheduledAt.ToString("dd MMM yyyy HH:mm") · @interview.Interviewer?.FullName</div>
+                    </div>
+                }
+                @if (!Model.UpcomingInterviews.Any())
+                {
+                    <p class="text-secondary mb-0">No upcoming interviews.</p>
+                }
+            </div>
+        </div>
     </div>
 </div>

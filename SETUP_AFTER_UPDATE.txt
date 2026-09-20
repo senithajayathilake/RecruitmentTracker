@@ -1,27 +1,69 @@
-RECRUITMENT TRACKER - UPDATED BUILD
+RECRUITMENT TRACKER - FINAL VERSION
 
-1. Extract this ZIP.
-2. Open RecruitmentTracker.sln in Visual Studio 2022.
-3. Build -> Rebuild Solution.
-4. Press F5.
-5. The development LocalDB database is recreated automatically if it is missing
-   the new Applications table or Candidate account link.
-6. Use the demo HR account:
-   Email: hr@recruitment.local
-   Password: Hr12345
+HOW TO USE THIS VERSION
 
-Main features:
-- Candidate / HR / HiringManager / Interviewer role-based access
-- Candidate registration automatically creates a Candidate profile
-- HR Candidates page automatically shows registered candidates
-- Candidate CV upload (PDF/DOCX)
-- Vacancy browsing and applications
-- AI CV screening and match scores
-- HR application review
-- HR role access management by registered email
-- Hiring Manager review dashboard
+1. BACK UP YOUR CURRENT PROJECT FIRST.
+2. Close Visual Studio.
+3. Keep your existing .git folder if you want to preserve Git history.
+4. Replace the project source files/folders with the contents of this final folder.
+5. Open RecruitmentTracker.sln in Visual Studio 2022.
+6. Build -> Rebuild Solution.
+7. Press F5.
 
-IMPORTANT:
-This is a development build using EnsureCreatedAsync(). If an older database
-schema is detected, RecruitmentTrackerDB is deleted and recreated. Do not use
-this database initialization approach for production data.
+IMPORTANT DATABASE NOTE
+-----------------------
+This university prototype uses EnsureCreatedAsync instead of EF migrations.
+
+The first time this final version runs, it checks whether your old LocalDB
+database contains the final Interviews, InterviewFeedbacks, Notifications and
+new application/vacancy columns.
+
+If not, RecruitmentTrackerDB is deleted and recreated automatically.
+
+BACK UP ANY TEST DATA YOU CARE ABOUT BEFORE RUNNING THE FINAL VERSION.
+
+DEMO ACCOUNTS
+-------------
+HR
+Email: hr@recruitment.local
+Password: Hr12345
+
+Candidate
+Email: candidate@recruitment.local
+Password: Candidate123
+
+Interviewer
+Email: interviewer@recruitment.local
+Password: Interviewer123
+
+Hiring Manager
+Email: manager@recruitment.local
+Password: Manager123
+
+FINAL FEATURES
+--------------
+- Role-based HR / Candidate / Interviewer / Hiring Manager portals
+- Vacancy management
+- Candidate profiles
+- CV upload
+- Candidate applications
+- AI-style CV screening
+- Configurable interview stages per vacancy
+- Optional block on advancement until previous feedback is submitted
+- Interview scheduling and interviewer assignment
+- In-app interview notifications
+- Structured 1-5 interviewer feedback
+- Candidate interview pipeline
+- Hired / Rejected / On Hold decisions
+- Candidate comparison
+- HR dashboard
+- Candidate dashboard
+- Interviewer dashboard
+- Hiring Manager dashboard
+- Management reports
+- CSV report export
+
+NOTE
+----
+External email/SMS is not configured because that requires a live provider
+and credentials. In-app notifications are included.

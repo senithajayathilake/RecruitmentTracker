@@ -3,7 +3,9 @@
     ViewData["Title"] = "Candidates";
 }
 <div class="container py-4">
-    <div class="page-heading"><div><span class="eyebrow">HR · CANDIDATES</span><h1>Candidate management</h1><p>All registered candidates appear here automatically.</p></div></div>
+    <div class="page-heading">
+        <div><span class="eyebrow">HR · CANDIDATES</span><h1>Candidate management</h1><p>All registered and manually added candidates in one place.</p></div>
+    </div>
     <div class="content-card">
         <div class="table-responsive">
             <table class="table align-middle">
@@ -15,11 +17,15 @@
                         <td><strong>@c.FullName</strong><br><small>@c.Email</small></td>
                         <td>@c.YearsOfExperience years</td>
                         <td class="small">@c.Skills</td>
-                       
-                        
-                        <td><span class="badge @(c.Status == "Shortlisted" ? "text-bg-success" : c.Status == "Rejected" ? "text-bg-danger" : "text-bg-secondary")">@c.Status</span></td>
+                        <td>@c.Cvs.Count</td>
+                        <td>@c.Applications.Count</td>
+                        <td><span class="badge @(c.Status == "Hired" ? "text-bg-success" : c.Status == "Rejected" ? "text-bg-danger" : "text-bg-secondary")">@c.Status</span></td>
                         <td class="text-end"><a asp-action="Details" asp-route-id="@c.CandidateId" class="btn btn-sm btn-light">View</a></td>
                     </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-secondary">No candidates found.</td></tr>
                 }
                 </tbody>
             </table>

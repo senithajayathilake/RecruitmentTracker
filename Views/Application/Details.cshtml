@@ -1,47 +1,163 @@
 @model Application
 @{
     ViewData["Title"] = "Application Review";
+    var orderedInterviews = Model.Interviews.OrderBy(i => i.InterviewStage?.StageOrder ?? int.MaxValue).ThenBy(i => i.ScheduledAt).ToList();
 }
 <div class="container py-4">
-    <div class="page-heading"><div><span class="eyebrow">APPLICATION REVIEW</span><h1>@Model.Candidate?.FullName</h1><p>@Model.Vacancy?.JobTitle · @Model.Candidate?.Email</p></div><span class="badge text-bg-secondary align-self-start">@Model.Status</span></div>
+    <div class="page-heading">
+        <div>
+            <span class="eyebrow">APPLICATION REVIEW</span>
+            <h1>@Model.Candidate?.FullName</h1>
+            <p>@Model.Vacancy?.JobTitle · @Model.Candidate?.Email</p>
+        </div>
+        <span class="badge text-bg-secondary align-self-start">@Model.Status</span>
+    </div>
+
     <div class="row g-4">
         <div class="col-lg-7">
             <div class="content-card">
-                <h5>Candidate</h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5>Candidate</h5>
+                    @if (User.IsInRole("HR"))
+                    {
+                        <a asp-controller="Interview" asp-action="Schedule" asp-route-applicationId="@Model.ApplicationId" class="btn btn-primary btn-sm">
+                            <i class="bi bi-calendar-plus me-1"></i>Schedule interview
+                        </a>
+                    }
+                </div>
                 <div class="pipeline-row"><span>Qualification</span><strong>@Model.Candidate?.HighestQualification</strong></div>
                 <div class="pipeline-row"><span>Experience</span><strong>@Model.Candidate?.YearsOfExperience years</strong></div>
                 <div class="pipeline-row"><span>Skills</span><strong>@Model.Candidate?.Skills</strong></div>
                 <div class="pipeline-row"><span>Applied</span><strong>@Model.AppliedDate.ToLocalTime().ToString("dd MMM yyyy HH:mm")</strong></div>
+                <div class="pipeline-row"><span>Current interview stage</span><strong>@(Model.CurrentInterviewStage?.StageName ?? "Not started")</strong></div>
             </div>
+
+            <div class="content-card mt-4">
+                <h5>Interview pipeline</h5>
+                @if (Model.Vacancy?.InterviewStages.Any() != true)
+                {
+                    <p class="text-secondary mt-3">No interview stages have been configured for this vacancy.</p>
+                }
+                else
+                {
+                    @foreach (var stage in Model.Vacancy.InterviewStages.OrderBy(s => s.StageOrder))
+                    {
+                        var interview = orderedInterviews.LastOrDefault(i => i.InterviewStageId == stage.InterviewStageId && i.Status != "Cancelled");
+                        <div class="stage-row">
+                            <div class="stage-number">@stage.StageOrder</div>
+                            <div class="flex-grow-1">
+                                <strong>@stage.StageName</strong>
+                                @if (interview == null)
+                                {
+                                    <div class="small text-secondary">Not scheduled</div>
+                                }
+                                else
+                                {
+                                    <div class="small text-secondary">
+                                        @interview.ScheduledAt.ToString("dd MMM yyyy HH:mm") · @interview.Interviewer?.FullName · @interview.Status
+                                    </div>
+                                }
+                            </div>
+                            @if (interview?.Feedback != null)
+                            {
+                                <span class="badge text-bg-success">@interview.Feedback.AverageScore / 5 · @interview.Feedback.Recommendation</span>
+                                <a asp-controller="Interview" asp-action="Details" asp-route-id="@interview.InterviewId" class="btn btn-sm btn-light ms-2">View</a>
+                            }
+                            else if (interview != null)
+                            {
+                                <span class="badge text-bg-warning">Feedback pending</span>
+                                <a asp-controller="Interview" asp-action="Details" asp-route-id="@interview.InterviewId" class="btn btn-sm btn-light ms-2">View</a>
+                            }
+                        </div>
+                    }
+                }
+
+                @if (Model.Vacancy?.RequireFeedbackBeforeAdvance == true)
+                {
+                    <div class="alert alert-info mt-3 mb-0">
+                        Feedback is required before the candidate can be scheduled into the next interview stage.
+                    </div>
+                }
+            </div>
+
             <div class="content-card mt-4">
                 <h5>CV</h5>
                 @if (Model.CandidateCv != null)
                 {
-                    <div class="cv-row mt-3"><i class="bi bi-file-earmark-text fs-3"></i><div><strong>@Model.CandidateCv.FileName</strong><div class="small text-secondary">Uploaded @Model.CandidateCv.UploadedDate.ToLocalTime().ToString("dd MMM yyyy")</div></div><a href="@Model.CandidateCv.FilePath" target="_blank" class="btn btn-sm btn-light ms-auto">Open CV</a></div>
+                    <div class="cv-row mt-3">
+                        <i class="bi bi-file-earmark-text fs-3"></i>
+                        <div>
+                            <strong>@Model.CandidateCv.FileName</strong>
+                            <div class="small text-secondary">Uploaded @Model.CandidateCv.UploadedDate.ToLocalTime().ToString("dd MMM yyyy")</div>
+                        </div>
+                        <a href="@Model.CandidateCv.FilePath" target="_blank" class="btn btn-sm btn-light ms-auto">Open CV</a>
+                    </div>
                 }
             </div>
+
             <div class="content-card mt-4">
                 <h5>Decision</h5>
+                <p class="small text-secondary">Use On Hold while more information is needed, or record the final hire/reject decision.</p>
                 <div class="d-flex flex-wrap gap-2 mt-3">
-                    @foreach (var status in new[] { "Under Review", "Shortlisted", "Rejected", "Interview" })
+                    @foreach (var status in new[] { "Under Review", "Shortlisted", "On Hold", "Hired", "Rejected" })
                     {
                         <form asp-action="SetStatus" method="post">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@Model.ApplicationId" />
                             <input type="hidden" name="status" value="@status" />
-                            <button class="btn @(status == "Shortlisted" ? "btn-success" : status == "Rejected" ? "btn-outline-danger" : "btn-outline-primary")">@status</button>
+                            <button class="btn @(status == "Hired" ? "btn-success" : status == "Rejected" ? "btn-outline-danger" : status == Model.Status ? "btn-primary" : "btn-outline-primary")">@status</button>
                         </form>
                     }
                 </div>
             </div>
         </div>
+
         <div class="col-lg-5">
             <div class="content-card">
-                <div class="d-flex justify-content-between align-items-center"><h5>AI CV screening</h5>@if (User.IsInRole("HR")) { <form asp-action="RunAiScreening" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.ApplicationId" /><button class="btn btn-sm btn-primary">Run AI</button></form> }</div>
-                <div class="text-center py-3"><div class="score display-5">@((Model.AiScore ?? 0).ToString("0.0"))%</div><div class="text-secondary">match score</div></div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5>AI CV screening</h5>
+                    @if (User.IsInRole("HR"))
+                    {
+                        <form asp-action="RunAiScreening" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.ApplicationId" />
+                            <button class="btn btn-sm btn-primary">Run AI</button>
+                        </form>
+                    }
+                </div>
+                <div class="text-center py-3">
+                    <div class="score display-5">@((Model.AiScore ?? 0).ToString("0.0"))%</div>
+                    <div class="text-secondary">match score</div>
+                </div>
                 <div class="pipeline-row"><span>Matched</span><strong>@Model.MatchedSkills</strong></div>
                 <div class="pipeline-row"><span>Missing</span><strong>@Model.MissingSkills</strong></div>
                 <div class="mt-3 small text-secondary">@Model.AiSummary</div>
+            </div>
+
+            <div class="content-card mt-4">
+                <h5>Interview evidence</h5>
+                @{
+                    var feedbacks = orderedInterviews.Where(i => i.Feedback != null).Select(i => i.Feedback!).ToList();
+                }
+                @if (!feedbacks.Any())
+                {
+                    <p class="text-secondary mb-0">No interview feedback submitted yet.</p>
+                }
+                else
+                {
+                    <div class="text-center py-3">
+                        <div class="score display-5">@feedbacks.Average(f => f.AverageScore).ToString("0.0") / 5</div>
+                        <div class="text-secondary">average interview score</div>
+                    </div>
+                    @foreach (var interview in orderedInterviews.Where(i => i.Feedback != null))
+                    {
+                        <div class="border rounded p-3 mb-2">
+                            <strong>@interview.InterviewStage?.StageName</strong>
+                            <div class="small text-secondary">@interview.Feedback!.AverageScore / 5 · @interview.Feedback.Recommendation</div>
+                            <div class="small mt-1">@interview.Feedback.Comments</div>
+                        </div>
+                    }
+                }
             </div>
         </div>
     </div>

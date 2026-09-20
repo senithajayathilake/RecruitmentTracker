@@ -1,1 +1,72 @@
-<div class="container py-5"><div class="page-heading"><div><span class="eyebrow">INTERVIEWER</span><h1>Interviewer dashboard</h1><p>Interview scheduling and feedback will be added in PB09–PB11.</p></div></div></div>
+@model InterviewerDashboardViewModel
+@{
+    ViewData["Title"] = "Interviewer Dashboard";
+}
+<div class="container py-4">
+    <div class="page-heading">
+        <div>
+            <span class="eyebrow">INTERVIEWER</span>
+            <h1>Interviewer dashboard</h1>
+            <p>See assigned interviews and submit structured feedback.</p>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6"><div class="stat-card"><span>Assigned interviews</span><strong>@Model.Interviews.Count</strong><i class="bi bi-calendar-event"></i></div></div>
+        <div class="col-md-6"><div class="stat-card"><span>Pending feedback</span><strong>@Model.PendingFeedbackCount</strong><i class="bi bi-chat-square-text"></i></div></div>
+    </div>
+
+    <div class="content-card mb-4">
+        <h5>My interviews</h5>
+        <div class="table-responsive mt-3">
+            <table class="table align-middle">
+                <thead><tr><th>Candidate</th><th>Vacancy</th><th>Stage</th><th>Date / time</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var item in Model.Interviews)
+                {
+                    <tr>
+                        <td><strong>@item.Application?.Candidate?.FullName</strong></td>
+                        <td>@item.Application?.Vacancy?.JobTitle</td>
+                        <td>@item.InterviewStage?.StageName</td>
+                        <td>@item.ScheduledAt.ToString("dd MMM yyyy HH:mm")</td>
+                        <td><span class="badge text-bg-secondary">@item.Status</span></td>
+                        <td class="text-end">
+                            <a asp-controller="Interview" asp-action="Details" asp-route-id="@item.InterviewId" class="btn btn-sm btn-light">View</a>
+                            @if (item.Status != "Cancelled")
+                            {
+                                <a asp-controller="Interview" asp-action="Feedback" asp-route-id="@item.InterviewId" class="btn btn-sm btn-primary">
+                                    @(item.Feedback == null ? "Feedback" : "Edit feedback")
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Interviews.Any())
+                {
+                    <tr><td colspan="6" class="text-secondary">No interviews have been assigned to you.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h5>Notifications</h5>
+        @if (!Model.Notifications.Any())
+        {
+            <p class="text-secondary mt-3 mb-0">No notifications yet.</p>
+        }
+        @foreach (var n in Model.Notifications)
+        {
+            <form asp-controller="Notification" asp-action="Read" method="post" class="notification-row">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@n.NotificationId" />
+                <button class="btn btn-link text-start text-decoration-none p-0 w-100">
+                    <strong class="@(n.IsRead ? "text-secondary" : "")">@n.Title</strong>
+                    <div class="small text-secondary">@n.Message</div>
+                    <div class="small text-secondary">@n.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</div>
+                </button>
+            </form>
+        }
+    </div>
+</div>

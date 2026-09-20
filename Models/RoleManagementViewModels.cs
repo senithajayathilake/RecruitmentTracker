@@ -25,9 +25,15 @@ public class CandidateDashboardViewModel
     public List<CandidateCv> Cvs { get; set; } = new();
     public List<Vacancy> OpenVacancies { get; set; } = new();
     public List<Application> Applications { get; set; } = new();
+    public List<Interview> UpcomingInterviews { get; set; } = new();
+    public List<Notification> Notifications { get; set; } = new();
 }
 
 public class HiringManagerDashboardViewModel
 {
     public List<Application> Applications { get; set; } = new();
+    public int OpenVacancies { get; set; }
+    public int HiredCount { get; set; }
+    public int PendingDecisions { get; set; }
+    public int CompletedInterviews { get; set; }
 }

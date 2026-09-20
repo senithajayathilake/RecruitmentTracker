@@ -1,0 +1,50 @@
+@model ReportsViewModel
+@{
+    ViewData["Title"] = "Recruitment Reports";
+}
+<div class="container py-4">
+    <div class="page-heading">
+        <div>
+            <span class="eyebrow">MANAGEMENT OVERSIGHT</span>
+            <h1>Recruitment reports</h1>
+            <p>Live recruitment metrics with an export for management review.</p>
+        </div>
+        <a asp-action="ExportCsv" class="btn btn-primary"><i class="bi bi-download me-2"></i>Export CSV</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3"><div class="stat-card"><span>Open vacancies</span><strong>@Model.OpenVacancies</strong><i class="bi bi-briefcase"></i></div></div>
+        <div class="col-md-3"><div class="stat-card"><span>Applications</span><strong>@Model.TotalApplications</strong><i class="bi bi-send"></i></div></div>
+        <div class="col-md-3"><div class="stat-card"><span>Hired</span><strong>@Model.Hired</strong><i class="bi bi-person-check"></i></div></div>
+        <div class="col-md-3"><div class="stat-card"><span>Completed interviews</span><strong>@Model.CompletedInterviews</strong><i class="bi bi-chat-square-check"></i></div></div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4"><div class="metric"><span>Rejected</span><strong>@Model.Rejected</strong></div></div>
+        <div class="col-md-4"><div class="metric"><span>On hold</span><strong>@Model.OnHold</strong></div></div>
+        <div class="col-md-4"><div class="metric"><span>Scheduled interviews</span><strong>@Model.ScheduledInterviews</strong></div></div>
+    </div>
+
+    <div class="content-card">
+        <h5>Vacancy performance</h5>
+        <div class="table-responsive mt-3">
+            <table class="table align-middle">
+                <thead><tr><th>Vacancy</th><th>Department</th><th>Status</th><th>Applications</th><th>Hired</th><th>Rejected</th><th>Average AI score</th></tr></thead>
+                <tbody>
+                @foreach (var row in Model.VacancyRows)
+                {
+                    <tr>
+                        <td><strong>@row.JobTitle</strong></td>
+                        <td>@row.Department</td>
+                        <td><span class="badge text-bg-secondary">@row.Status</span></td>
+                        <td>@row.Applications</td>
+                        <td>@row.Hired</td>
+                        <td>@row.Rejected</td>
+                        <td>@row.AverageAiScore.ToString("0.0")%</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

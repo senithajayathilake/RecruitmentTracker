@@ -14,15 +14,18 @@ public class ApplicationController : Controller
     private readonly ApplicationDbContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IAiCvScreeningService _ai;
+    private readonly INotificationService _notifications;
 
     public ApplicationController(
         ApplicationDbContext db,
         UserManager<ApplicationUser> userManager,
-        IAiCvScreeningService ai)
+        IAiCvScreeningService ai,
+        INotificationService notifications)
     {
         _db = db;
         _userManager = userManager;
         _ai = ai;
+        _notifications = notifications;
     }
 
     [Authorize(Roles = "Candidate")]
@@ -45,7 +48,8 @@ public class ApplicationController : Controller
             return RedirectToAction("Browse", "Vacancy");
         }
 
-        if (await _db.Applications.AnyAsync(a => a.CandidateId == candidate.CandidateId && a.VacancyId == vacancyId))
+        if (await _db.Applications.AnyAsync(a =>
+            a.CandidateId == candidate.CandidateId && a.VacancyId == vacancyId))
         {
             TempData["Error"] = "You have already applied for this vacancy.";
             return RedirectToAction("Candidate", "Dashboard");
@@ -76,6 +80,12 @@ public class ApplicationController : Controller
         _db.Applications.Add(application);
         await _db.SaveChangesAsync();
 
+        await _notifications.NotifyRoleAsync(
+            "HR",
+            "New application received",
+            $"{candidate.FullName} applied for {vacancy.JobTitle}.",
+            $"/Application/Details/{application.ApplicationId}");
+
         TempData["Success"] = "Application submitted. HR can now see your application and AI screening result.";
         return RedirectToAction("Candidate", "Dashboard");
     }
@@ -88,6 +98,14 @@ public class ApplicationController : Controller
                 .ThenInclude(c => c!.Cvs)
             .Include(a => a.CandidateCv)
             .Include(a => a.Vacancy)
+                .ThenInclude(v => v!.InterviewStages)
+            .Include(a => a.CurrentInterviewStage)
+            .Include(a => a.Interviews)
+                .ThenInclude(i => i.InterviewStage)
+            .Include(a => a.Interviews)
+                .ThenInclude(i => i.Interviewer)
+            .Include(a => a.Interviews)
+                .ThenInclude(i => i.Feedback)
             .FirstOrDefaultAsync(a => a.ApplicationId == id);
 
         return application == null ? NotFound() : View(application);
@@ -98,8 +116,13 @@ public class ApplicationController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SetStatus(int id, string status)
     {
+        var allowed = new[] { "Under Review", "Shortlisted", "On Hold", "Hired", "Rejected" };
+        if (!allowed.Contains(status))
+            return BadRequest();
+
         var application = await _db.Applications
             .Include(a => a.Candidate)
+            .Include(a => a.Vacancy)
             .FirstOrDefaultAsync(a => a.ApplicationId == id);
 
         if (application == null) return NotFound();
@@ -110,6 +133,15 @@ public class ApplicationController : Controller
 
         await _db.SaveChangesAsync();
 
+        if (application.Candidate != null && application.Vacancy != null)
+        {
+            await _notifications.NotifyUserAsync(
+                application.Candidate.ApplicationUserId,
+                "Application status updated",
+                $"Your application for {application.Vacancy.JobTitle} is now '{status}'.");
+        }
+
+        TempData["Success"] = $"Application status changed to {status}.";
         return RedirectToAction("Details", new { id });
     }
 

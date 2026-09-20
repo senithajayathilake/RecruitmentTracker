@@ -21,10 +21,12 @@ public class Application
     public DateTime AppliedDate { get; set; } = DateTime.UtcNow;
 
     public double? AiScore { get; set; }
-
     public string? AiSummary { get; set; }
-
     public string? MatchedSkills { get; set; }
-
     public string? MissingSkills { get; set; }
+
+    public int? CurrentInterviewStageId { get; set; }
+    public InterviewStage? CurrentInterviewStage { get; set; }
+
+    public ICollection<Interview> Interviews { get; set; } = new List<Interview>();
 }

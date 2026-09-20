@@ -5,15 +5,38 @@
 }
 <div class="container py-4">
     <div class="page-heading">
-        <div><span class="eyebrow">CANDIDATE PORTAL</span><h1>Welcome, @Model.Candidate.FullName</h1><p>Your profile, CV and applications are all in one place.</p></div>
+        <div><span class="eyebrow">CANDIDATE PORTAL</span><h1>Welcome, @Model.Candidate.FullName</h1><p>Your profile, CV, applications and interview updates in one place.</p></div>
         <a asp-controller="CV" asp-action="Upload" class="btn btn-primary"><i class="bi bi-upload me-2"></i>Upload CV</a>
     </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-md-4"><div class="stat-card"><span>My CVs</span><strong>@Model.Cvs.Count</strong><i class="bi bi-file-earmark-text"></i></div></div>
-        <div class="col-md-4"><div class="stat-card"><span>Applications</span><strong>@Model.Applications.Count</strong><i class="bi bi-send"></i></div></div>
-        <div class="col-md-4"><div class="stat-card"><span>Open Jobs</span><strong>@Model.OpenVacancies.Count</strong><i class="bi bi-briefcase"></i></div></div>
+        <div class="col-md-3"><div class="stat-card"><span>My CVs</span><strong>@Model.Cvs.Count</strong><i class="bi bi-file-earmark-text"></i></div></div>
+        <div class="col-md-3"><div class="stat-card"><span>Applications</span><strong>@Model.Applications.Count</strong><i class="bi bi-send"></i></div></div>
+        <div class="col-md-3"><div class="stat-card"><span>Upcoming interviews</span><strong>@Model.UpcomingInterviews.Count</strong><i class="bi bi-calendar-event"></i></div></div>
+        <div class="col-md-3"><div class="stat-card"><span>Open jobs</span><strong>@Model.OpenVacancies.Count</strong><i class="bi bi-briefcase"></i></div></div>
     </div>
+
+    @if (Model.UpcomingInterviews.Any())
+    {
+        <div class="content-card mb-4">
+            <h5>Upcoming interviews</h5>
+            @foreach (var interview in Model.UpcomingInterviews)
+            {
+                <div class="border rounded p-3 mt-3">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>@interview.Application?.Vacancy?.JobTitle</strong>
+                            <div class="small text-secondary">@interview.InterviewStage?.StageName</div>
+                        </div>
+                        <span class="badge text-bg-primary">@interview.ScheduledAt.ToString("dd MMM yyyy HH:mm")</span>
+                    </div>
+                    <div class="small mt-2">Interviewer: @interview.Interviewer?.FullName</div>
+                    <div class="small">Location / link: @interview.LocationOrMeetingLink</div>
+                    <a asp-controller="Interview" asp-action="Details" asp-route-id="@interview.InterviewId" class="btn btn-sm btn-light mt-2">View details</a>
+                </div>
+            }
+        </div>
+    }
 
     <div class="row g-4">
         <div class="col-lg-5">
@@ -34,10 +57,6 @@
                         <div><strong>@cv.FileName</strong><div class="small text-secondary">@cv.UploadedDate.ToLocalTime().ToString("dd MMM yyyy HH:mm")</div></div>
                         <a href="@cv.FilePath" target="_blank" class="btn btn-sm btn-light ms-auto">Open</a>
                     </div>
-                    @if (cv.AiScore.HasValue)
-                    {
-                        <div class="mt-3 p-3 rounded bg-light"><strong>Latest AI screening: @cv.AiScore.Value.ToString("0.0")%</strong><div class="small text-secondary mt-1">@cv.AiSummary</div></div>
-                    }
                 }
             </div>
 
@@ -47,6 +66,25 @@
                 <div class="pipeline-row"><span>Qualification</span><strong>@Model.Candidate.HighestQualification</strong></div>
                 <div class="pipeline-row"><span>Experience</span><strong>@Model.Candidate.YearsOfExperience years</strong></div>
                 <div class="pipeline-row"><span>Skills</span><strong>@Model.Candidate.Skills</strong></div>
+            </div>
+
+            <div class="content-card mt-4">
+                <h5>Notifications</h5>
+                @if (!Model.Notifications.Any())
+                {
+                    <p class="text-secondary mt-3 mb-0">No notifications yet.</p>
+                }
+                @foreach (var n in Model.Notifications)
+                {
+                    <form asp-controller="Notification" asp-action="Read" method="post" class="notification-row">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@n.NotificationId" />
+                        <button class="btn btn-link text-start text-decoration-none p-0 w-100">
+                            <strong class="@(n.IsRead ? "text-secondary" : "")">@n.Title</strong>
+                            <div class="small text-secondary">@n.Message</div>
+                        </button>
+                    </form>
+                }
             </div>
         </div>
 

@@ -30,10 +30,20 @@ public class InterviewStageController : Controller
     public async Task<IActionResult> Create(InterviewStage model)
     {
         ModelState.Remove(nameof(InterviewStage.Vacancy));
+
+        var duplicateOrder = await _db.InterviewStages.AnyAsync(s =>
+            s.VacancyId == model.VacancyId && s.StageOrder == model.StageOrder);
+
+        if (duplicateOrder)
+            ModelState.AddModelError(nameof(model.StageOrder),
+                "Another stage already uses this order number.");
+
         if (!ModelState.IsValid) return View(model);
 
         _db.InterviewStages.Add(model);
         await _db.SaveChangesAsync();
+
+        TempData["Success"] = "Interview stage added.";
         return RedirectToAction(nameof(Index), new { vacancyId = model.VacancyId });
     }
 
@@ -50,6 +60,16 @@ public class InterviewStageController : Controller
         if (id != model.InterviewStageId) return BadRequest();
 
         ModelState.Remove(nameof(InterviewStage.Vacancy));
+
+        var duplicateOrder = await _db.InterviewStages.AnyAsync(s =>
+            s.VacancyId == model.VacancyId &&
+            s.StageOrder == model.StageOrder &&
+            s.InterviewStageId != model.InterviewStageId);
+
+        if (duplicateOrder)
+            ModelState.AddModelError(nameof(model.StageOrder),
+                "Another stage already uses this order number.");
+
         if (!ModelState.IsValid) return View(model);
 
         var stage = await _db.InterviewStages.FindAsync(id);
@@ -60,6 +80,7 @@ public class InterviewStageController : Controller
         stage.Description = model.Description;
 
         await _db.SaveChangesAsync();
+        TempData["Success"] = "Interview stage updated.";
         return RedirectToAction(nameof(Index), new { vacancyId = stage.VacancyId });
     }
 
@@ -70,10 +91,20 @@ public class InterviewStageController : Controller
         var stage = await _db.InterviewStages.FindAsync(id);
         if (stage == null) return NotFound();
 
+        var inUse = await _db.Interviews.AnyAsync(i => i.InterviewStageId == id)
+                    || await _db.Applications.AnyAsync(a => a.CurrentInterviewStageId == id);
+
+        if (inUse)
+        {
+            TempData["Error"] = "This stage is already used by a candidate and cannot be deleted.";
+            return RedirectToAction(nameof(Index), new { vacancyId = stage.VacancyId });
+        }
+
         var vacancyId = stage.VacancyId;
         _db.InterviewStages.Remove(stage);
         await _db.SaveChangesAsync();
 
+        TempData["Success"] = "Interview stage deleted.";
         return RedirectToAction(nameof(Index), new { vacancyId });
     }
 }
