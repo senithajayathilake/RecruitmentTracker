@@ -2,8 +2,9 @@
 @{
     ViewData["Title"] = "Candidate Sign Up";
 }
-<div class="auth-scene">
-    <div class="auth-grid"></div>
+
+<section class="auth-scene">
+    <div class="auth-grid" aria-hidden="true"></div>
     <a asp-controller="Home" asp-action="Index" class="auth-brand">
         <span class="career-brand-mark">H</span>
         <span class="career-brand-copy"><strong>HIGHER FLOW</strong><small>Careers</small></span>
@@ -13,17 +14,39 @@
         <span class="career-card-kicker">CANDIDATE PORTAL</span>
         <h2>Create your account</h2>
         <p class="auth-intro">Create a profile to apply for roles and track your progress.</p>
+
         <form asp-action="Register" method="post">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-            <div class="mb-3"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control form-control-lg" placeholder="Your full name" /></div>
-            <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control form-control-lg" placeholder="you@example.com" /></div>
-            <div class="row g-3">
-                <div class="col-md-6"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control form-control-lg" /></div>
-                <div class="col-md-6"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control form-control-lg" /></div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control form-control-lg" placeholder="Your full name" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
             </div>
-            <button class="btn career-primary-btn btn-lg w-100 mt-4">Create account <i class="bi bi-arrow-up-right ms-2"></i></button>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control form-control-lg" placeholder="you@example.com" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control form-control-lg" placeholder="Create a password" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <input asp-for="ConfirmPassword" class="form-control form-control-lg" placeholder="Repeat password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <button class="btn career-primary-btn btn-lg w-100 mt-4" type="submit">Create account <i class="bi bi-arrow-up-right ms-2"></i></button>
         </form>
+
         <p class="text-center mt-4 mb-0 auth-switch">Already registered? <a asp-action="Login">Sign in</a></p>
     </div>
-</div>
+</section>

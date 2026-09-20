@@ -1,0 +1,45 @@
+@{
+    ViewData["Title"] = "Contact";
+    Layout = "_PublicLayout";
+}
+
+<section class="public-page-hero compact">
+    <div class="public-kicker"><span></span>CONTACT</div>
+    <h1>Talk to the <em>recruitment team.</em></h1>
+    <p>Have a question about an opportunity or your application? Send us a message below.</p>
+</section>
+
+<section class="contact-layout">
+    <div class="contact-copy-card">
+        <span class="info-number">HIGHER FLOW</span>
+        <h2>We are here to help.</h2>
+        <p>Use this form for recruitment and candidate enquiries. For an existing application, sign in to your candidate account to view your latest status and notifications.</p>
+        <div class="contact-points">
+            <div><i class="bi bi-briefcase"></i><span><strong>Opportunity questions</strong><small>Ask about open roles and application requirements.</small></span></div>
+            <div><i class="bi bi-person-check"></i><span><strong>Application support</strong><small>Get help with your candidate profile or recruitment journey.</small></span></div>
+            <div><i class="bi bi-shield-check"></i><span><strong>Private by design</strong><small>Your recruitment information stays within the hiring workflow.</small></span></div>
+        </div>
+    </div>
+
+    <div class="contact-form-card">
+        @if (TempData["ContactSuccess"] != null)
+        {
+            <div class="public-success">@TempData["ContactSuccess"]</div>
+        }
+        @if (ViewBag.ContactError != null)
+        {
+            <div class="public-error">@ViewBag.ContactError</div>
+        }
+
+        <form asp-controller="Home" asp-action="Contact" method="post">
+            @Html.AntiForgeryToken()
+            <div class="contact-field-row">
+                <label>Full name<input name="name" value="@ViewBag.Name" required placeholder="Your name" /></label>
+                <label>Email<input name="email" type="email" value="@ViewBag.Email" required placeholder="you@example.com" /></label>
+            </div>
+            <label>Subject<input name="subject" value="@ViewBag.Subject" placeholder="What can we help with?" /></label>
+            <label>Message<textarea name="message" rows="6" required placeholder="Tell us how we can help...">@ViewBag.Message</textarea></label>
+            <button class="public-primary-cta border-0" type="submit">Send message <i class="bi bi-send"></i></button>
+        </form>
+    </div>
+</section>

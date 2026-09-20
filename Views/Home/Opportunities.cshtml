@@ -1,0 +1,58 @@
+@model IEnumerable<RecruitmentTracker.Models.Vacancy>
+@{
+    ViewData["Title"] = "Opportunities";
+    Layout = "_PublicLayout";
+}
+
+<section class="public-page-hero compact opportunities-hero">
+    <div class="public-kicker"><span></span>OPEN OPPORTUNITIES</div>
+    <h1>Find your next <em>opportunity.</em></h1>
+    <p>Explore currently open roles. Create a candidate account when you are ready to apply and track your progress.</p>
+</section>
+
+<section class="opportunity-list">
+    @if (!Model.Any())
+    {
+        <div class="public-empty-state">
+            <span class="info-number">NO OPEN ROLES</span>
+            <h2>Nothing open right now.</h2>
+            <p>Check back soon for new opportunities.</p>
+            <a class="public-secondary-cta fit" asp-controller="Home" asp-action="Contact">Contact recruitment</a>
+        </div>
+    }
+    else
+    {
+        foreach (var vacancy in Model)
+        {
+            <article class="opportunity-card">
+                <div class="opportunity-card-top">
+                    <div>
+                        <span class="opportunity-department">@vacancy.Department</span>
+                        <h2>@vacancy.JobTitle</h2>
+                    </div>
+                    <span class="opportunity-status">OPEN</span>
+                </div>
+
+                <div class="opportunity-meta">
+                    @if (!string.IsNullOrWhiteSpace(vacancy.Location)) { <span><i class="bi bi-geo-alt"></i>@vacancy.Location</span> }
+                    @if (!string.IsNullOrWhiteSpace(vacancy.EmploymentType)) { <span><i class="bi bi-briefcase"></i>@vacancy.EmploymentType</span> }
+                    <span><i class="bi bi-calendar-event"></i>Apply by @vacancy.ApplicationDeadline.ToString("dd MMM yyyy")</span>
+                </div>
+
+                <p>@vacancy.Description</p>
+
+                <div class="opportunity-actions">
+                    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Candidate"))
+                    {
+                        <a class="public-primary-cta fit" asp-controller="Vacancy" asp-action="Details" asp-route-id="@vacancy.VacancyId">View role <i class="bi bi-arrow-up-right"></i></a>
+                    }
+                    else
+                    {
+                        <a class="public-primary-cta fit" asp-controller="Account" asp-action="Register">Create account to apply <i class="bi bi-arrow-up-right"></i></a>
+                        <a class="public-text-link" asp-controller="Account" asp-action="Login">Already registered? Sign in</a>
+                    }
+                </div>
+            </article>
+        }
+    }
+</section>

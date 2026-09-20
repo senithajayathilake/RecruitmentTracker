@@ -2,8 +2,9 @@
 @{
     ViewData["Title"] = "Login";
 }
-<div class="auth-scene">
-    <div class="auth-grid"></div>
+
+<section class="auth-scene">
+    <div class="auth-grid" aria-hidden="true"></div>
     <a asp-controller="Home" asp-action="Index" class="auth-brand">
         <span class="career-brand-mark">H</span>
         <span class="career-brand-copy"><strong>HIGHER FLOW</strong><small>Recruitment</small></span>
@@ -13,26 +14,32 @@
         <span class="career-card-kicker">WELCOME BACK</span>
         <h2>Sign in</h2>
         <p class="auth-intro">Access your recruitment workspace.</p>
+
         <form asp-action="Login" method="post">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
             <div class="mb-3">
                 <label asp-for="Email" class="form-label"></label>
                 <input asp-for="Email" class="form-control form-control-lg" placeholder="you@example.com" />
                 <span asp-validation-for="Email" class="text-danger small"></span>
             </div>
+
             <div class="mb-3">
                 <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control form-control-lg" placeholder="••••••••" />
+                <input asp-for="Password" class="form-control form-control-lg" placeholder="Enter your password" />
                 <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
+
             <div class="form-check mb-4">
                 <input asp-for="RememberMe" class="form-check-input" />
                 <label asp-for="RememberMe" class="form-check-label">Remember me</label>
             </div>
-            <button class="btn career-primary-btn btn-lg w-100">Sign in <i class="bi bi-arrow-up-right ms-2"></i></button>
+
+            <button class="btn career-primary-btn btn-lg w-100" type="submit">Sign in <i class="bi bi-arrow-up-right ms-2"></i></button>
         </form>
+
         <p class="text-center mt-4 mb-0 auth-switch">Candidate? <a asp-action="Register">Create an account</a></p>
         <div class="demo-box mt-4"><strong>Demo HR:</strong> hr@recruitment.local / Hr12345</div>
     </div>
-</div>
+</section>

@@ -1,62 +1,65 @@
 @{
     ViewData["Title"] = "Careers";
+    Layout = "_PublicLayout";
 }
 
-<section class="career-portal">
-    <div class="career-grid"></div>
+<section class="landing-hero">
+    <div class="landing-copy">
+        <div class="public-kicker"><span></span>BUILD WHAT MATTERS</div>
+        <h1>Find work that <em>moves you forward.</em></h1>
+        <p class="landing-lead">Join a team that values clear thinking, meaningful work, and the people behind every idea.</p>
 
-    <header class="career-topbar">
-        <a class="career-brand" asp-controller="Home" asp-action="Index">
-            <span class="career-brand-mark">H</span>
-            <span class="career-brand-copy">
-                <strong>HIGHER FLOW</strong>
-                <small>Careers</small>
-            </span>
-        </a>
-        <div class="career-top-actions">
-            <span class="career-portal-label">RECRUITMENT PLATFORM</span>
-            <a asp-controller="Account" asp-action="Login" class="career-test-pill">
-                <span class="career-toggle-dot"></span>
-                STAFF LOGIN
-            </a>
-        </div>
-    </header>
-
-    <div class="career-shell">
-        <div class="career-copy">
-            <div class="career-kicker"><span></span> BUILD WHAT MATTERS</div>
-            <h1>Find your next<br /><em>opportunity.</em></h1>
-            <p>Join a team that values clear thinking, meaningful work, and the people behind every idea.</p>
-
-            <div class="career-values">
-                <div><b>01</b><span>PURPOSE-LED<br />WORK</span></div>
-                <div><b>02</b><span>ROOM TO<br />GROW</span></div>
-                <div><b>03</b><span>PEOPLE<br />FIRST</span></div>
-            </div>
+        <div class="landing-values">
+            <article class="landing-value-card">
+                <span class="value-index">01</span>
+                <div><strong>PURPOSE-LED WORK</strong><p>Make a real impact.</p></div>
+            </article>
+            <article class="landing-value-card">
+                <span class="value-index">02</span>
+                <div><strong>ROOM TO GROW</strong><p>Build your future.</p></div>
+            </article>
+            <article class="landing-value-card">
+                <span class="value-index">03</span>
+                <div><strong>PEOPLE FIRST</strong><p>A team that supports you.</p></div>
+            </article>
         </div>
 
-        <div class="career-action-card">
-            <span class="career-card-kicker">APPLICATION</span>
-            <h2>Start your application</h2>
-            <p>Browse open roles, create your candidate profile and share your CV. It only takes a few minutes.</p>
-
-            <div class="career-card-block">
-                <label>Looking for an opportunity?</label>
-                <a asp-controller="Account" asp-action="Register" class="btn career-primary-btn w-100">
-                    Create candidate account <i class="bi bi-arrow-up-right ms-2"></i>
-                </a>
-            </div>
-
-            <div class="career-divider"><span>or</span></div>
-
-            <a asp-controller="Account" asp-action="Login" class="btn career-secondary-btn w-100">
-                Sign in to your account
-            </a>
-
-            <div class="career-card-footer">
-                <i class="bi bi-shield-check"></i>
-                Your information is only accessible to the recruitment team.
-            </div>
+        <div class="landing-trust">
+            <small>BUILT AROUND PEOPLE</small>
+            <div><span>INNOVATION</span><i></i><span>COLLABORATION</span><i></i><span>IMPACT</span><i></i><span>OPPORTUNITY</span></div>
         </div>
     </div>
+
+    <aside class="landing-application-panel">
+        <div class="panel-label"><span>YOUR APPLICATION</span><small>01 / 03</small></div>
+        <h2>One profile.<span>Every opportunity.</span></h2>
+        <p>Browse open roles, create your candidate profile and share your CV. It only takes a few minutes.</p>
+
+        <div class="application-steps">
+            <div class="application-step">
+                <span class="step-icon"><i class="bi bi-person"></i></span>
+                <b>01</b>
+                <div><strong>Create profile</strong><small>Tell us about yourself.</small></div>
+            </div>
+            <div class="application-step">
+                <span class="step-icon"><i class="bi bi-file-earmark-text"></i></span>
+                <b>02</b>
+                <div><strong>Share your CV</strong><small>Upload PDF or DOCX.</small></div>
+            </div>
+            <div class="application-step">
+                <span class="step-icon"><i class="bi bi-bar-chart-line"></i></span>
+                <b>03</b>
+                <div><strong>Track progress</strong><small>Interviews and decisions.</small></div>
+            </div>
+        </div>
+
+        <a class="public-primary-cta" asp-controller="Account" asp-action="Register">Start your application <i class="bi bi-arrow-up-right"></i></a>
+        <div class="public-or"><span></span><small>or</small><span></span></div>
+        <a class="public-secondary-cta" asp-controller="Account" asp-action="Login">Sign in to your account</a>
+
+        <div class="panel-meta">
+            <span><i class="bi bi-shield-check"></i>Your information is private</span>
+            <span><i class="bi bi-clock"></i>Takes only a few minutes</span>
+        </div>
+    </aside>
 </section>

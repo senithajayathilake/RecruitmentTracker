@@ -55,55 +55,6 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    // This student prototype uses EnsureCreated instead of migrations.
-    // When a previous local database does not contain the final schema,
-    // recreate it once so the application starts with all required tables.
-    if (await db.Database.CanConnectAsync())
-    {
-        var connection = db.Database.GetDbConnection();
-        await connection.OpenAsync();
-
-        await using var command = connection.CreateCommand();
-        command.CommandText = @"
-            SELECT
-                CASE WHEN OBJECT_ID(N'[dbo].[AspNetRoles]', N'U') IS NULL THEN 1 ELSE 0 END,
-                CASE WHEN OBJECT_ID(N'[dbo].[Applications]', N'U') IS NULL THEN 1 ELSE 0 END,
-                CASE WHEN OBJECT_ID(N'[dbo].[Interviews]', N'U') IS NULL THEN 1 ELSE 0 END,
-                CASE WHEN OBJECT_ID(N'[dbo].[InterviewFeedbacks]', N'U') IS NULL THEN 1 ELSE 0 END,
-                CASE WHEN OBJECT_ID(N'[dbo].[Notifications]', N'U') IS NULL THEN 1 ELSE 0 END,
-                CASE WHEN COL_LENGTH(N'[dbo].[Candidates]', N'ApplicationUserId') IS NULL THEN 1 ELSE 0 END,
-                CASE WHEN COL_LENGTH(N'[dbo].[Applications]', N'CurrentInterviewStageId') IS NULL THEN 1 ELSE 0 END,
-                CASE WHEN COL_LENGTH(N'[dbo].[Vacancies]', N'RequireFeedbackBeforeAdvance') IS NULL THEN 1 ELSE 0 END";
-
-        await using var reader = await command.ExecuteReaderAsync();
-        var needsRecreate = false;
-
-        if (await reader.ReadAsync())
-        {
-            for (var i = 0; i < 8; i++)
-            {
-                if (reader.GetInt32(i) == 1)
-                {
-                    needsRecreate = true;
-                    break;
-                }
-            }
-        }
-
-        await reader.CloseAsync();
-        await connection.CloseAsync();
-
-        if (needsRecreate)
-        {
-            await db.Database.EnsureDeletedAsync();
-            await db.Database.EnsureCreatedAsync();
-        }
-    }
-    else
-    {
-        await db.Database.EnsureCreatedAsync();
-    }
-
     await db.Database.EnsureCreatedAsync();
     await SeedData.InitializeAsync(scope.ServiceProvider);
 }
