@@ -1,0 +1,177 @@
+﻿<div id="hf-chatbot">
+    <button id="hf-chat-button" type="button" title="HireFlow Assistant">
+        <i class="bi bi-chat-dots-fill"></i>
+    </button>
+
+    <div id="hf-chat-window">
+
+        <div class="hf-chat-header">
+            <div>
+                <strong>HireFlow Assistant</strong>
+                <small>Recruitment help</small>
+            </div>
+
+            <button id="hf-chat-close" type="button">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div id="hf-chat-messages">
+            <div class="hf-chat-message bot">
+                Hi! 👋 Ask me about vacancies, applications, CVs or interviews.
+            </div>
+        </div>
+
+        <div class="hf-chat-suggestions">
+            <button type="button" data-question="How do I apply?">
+                How do I apply?
+            </button>
+
+            <button type="button" data-question="How do I upload my CV?">
+                Upload CV
+            </button>
+
+            <button type="button" data-question="How do I check my application status?">
+                Application status
+            </button>
+        </div>
+
+        <div class="hf-chat-input-area">
+            <input id="hf-chat-input"
+                   type="text"
+                   placeholder="Ask a question..."
+                   autocomplete="off" />
+
+            <button id="hf-chat-send" type="button">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const chatButton = document.getElementById("hf-chat-button");
+        const chatWindow = document.getElementById("hf-chat-window");
+        const closeButton = document.getElementById("hf-chat-close");
+        const sendButton = document.getElementById("hf-chat-send");
+        const input = document.getElementById("hf-chat-input");
+        const messages = document.getElementById("hf-chat-messages");
+        const suggestions = document.querySelectorAll("[data-question]");
+
+        chatButton.addEventListener("click", function () {
+            chatWindow.classList.add("show");
+            input.focus();
+        });
+
+        closeButton.addEventListener("click", function () {
+            chatWindow.classList.remove("show");
+        });
+
+        sendButton.addEventListener("click", sendMessage);
+
+        input.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        suggestions.forEach(function (button) {
+            button.addEventListener("click", function () {
+                input.value = button.dataset.question;
+                sendMessage();
+            });
+        });
+
+        function sendMessage() {
+            const question = input.value.trim();
+
+            if (question === "") {
+                return;
+            }
+
+            addMessage(question, "user");
+            input.value = "";
+
+            setTimeout(function () {
+                addMessage(getAnswer(question), "bot");
+            }, 300);
+        }
+
+        function addMessage(text, type) {
+            const message = document.createElement("div");
+
+            message.classList.add("hf-chat-message");
+            message.classList.add(type);
+
+            message.textContent = text;
+
+            messages.appendChild(message);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function getAnswer(question) {
+            const q = question.toLowerCase();
+
+            if (q.includes("apply") || q.includes("application")) {
+                return "Open Opportunities, select a vacancy and choose Apply. You need a candidate account and profile.";
+            }
+
+            if (q.includes("cv") || q.includes("resume")) {
+                return "Log in as a candidate and upload your CV from your profile or CV section.";
+            }
+
+            if (q.includes("status") || q.includes("progress")) {
+                return "Open My Applications in your candidate account to check your application progress.";
+            }
+
+            if (q.includes("vacancy") || q.includes("job") || q.includes("opportunity")) {
+                return "Open the Opportunities page to view available vacancies and job details.";
+            }
+
+            if (q.includes("interview") || q.includes("schedule")) {
+                return "Interview details are shown in your HireFlow account when an interview is scheduled.";
+            }
+
+            if (q.includes("feedback")) {
+                return "Assigned interviewers can submit structured feedback and scores after an interview.";
+            }
+
+            if (q.includes("login") || q.includes("sign in")) {
+                return "Candidates use their candidate account. HR, interviewers and hiring managers use Staff Login.";
+            }
+
+            if (q.includes("register") || q.includes("account")) {
+                return "Choose Register or Create Profile to create a candidate account.";
+            }
+
+            if (q.includes("hr") || q.includes("recruiter")) {
+                return "HR can manage vacancies, candidates, interviews, screening, recruitment status and reports.";
+            }
+
+            if (q.includes("manager")) {
+                return "Hiring managers can review candidates, comparisons and management reports.";
+            }
+
+            if (q.includes("interviewer")) {
+                return "Interviewers can view assigned interviews and submit candidate feedback.";
+            }
+
+            if (q.includes("contact") || q.includes("help")) {
+                return "Open the Contact page for additional help.";
+            }
+
+            if (q.includes("hello") || q.includes("hi") || q.includes("hey")) {
+                return "Hi! 👋 How can I help you with HireFlow?";
+            }
+
+            if (q.includes("thank")) {
+                return "You're welcome!";
+            }
+
+            return "I can help with vacancies, applications, CV uploads, application status, interviews and HireFlow user roles.";
+        }
+    });
+</script>
