@@ -68,7 +68,58 @@ public class InterviewController : Controller
             DurationMinutes = 60
         });
     }
+    [Authorize(Roles = "HR")]
+    [HttpGet]
+    public async Task<IActionResult> AvailableInterviewers(
+    DateTime scheduledAt,
+    int durationMinutes)
+    {
+        if (durationMinutes < 15 || durationMinutes > 480)
+        {
+            return BadRequest();
+        }
 
+        var requestedStart = scheduledAt;
+        var requestedEnd = scheduledAt.AddMinutes(durationMinutes);
+
+        var interviewers = (await _userManager.GetUsersInRoleAsync("Interviewer"))
+            .OrderBy(u => u.FullName)
+            .ToList();
+
+        var interviewerIds = interviewers
+            .Select(u => u.Id)
+            .ToList();
+
+        var possibleConflicts = await _db.Interviews
+            .Where(i =>
+                interviewerIds.Contains(i.InterviewerId) &&
+                i.Status != "Cancelled" &&
+                i.ScheduledAt < requestedEnd)
+            .Select(i => new
+            {
+                i.InterviewerId,
+                i.ScheduledAt,
+                i.DurationMinutes
+            })
+            .ToListAsync();
+
+        var result = interviewers.Select(person =>
+        {
+            var hasConflict = possibleConflicts.Any(i =>
+                i.InterviewerId == person.Id &&
+                i.ScheduledAt.AddMinutes(i.DurationMinutes) > requestedStart);
+
+            return new
+            {
+                id = person.Id,
+                name = person.FullName,
+                email = person.Email,
+                isAvailable = !hasConflict
+            };
+        });
+
+        return Json(result);
+    }
     [Authorize(Roles = "HR")]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -92,7 +143,36 @@ public class InterviewController : Controller
         var interviewer = await _userManager.FindByIdAsync(model.InterviewerId);
         if (interviewer == null || !await _userManager.IsInRoleAsync(interviewer, "Interviewer"))
             ModelState.AddModelError(nameof(model.InterviewerId), "Select a valid interviewer.");
+        if (interviewer != null &&
+    await _userManager.IsInRoleAsync(interviewer, "Interviewer") &&
+    model.DurationMinutes >= 15 &&
+    model.DurationMinutes <= 480)
+        {
+            var requestedStart = model.ScheduledAt;
+            var requestedEnd = model.ScheduledAt.AddMinutes(model.DurationMinutes);
 
+            var possibleConflicts = await _db.Interviews
+                .Where(i =>
+                    i.InterviewerId == model.InterviewerId &&
+                    i.Status != "Cancelled" &&
+                    i.ScheduledAt < requestedEnd)
+                .Select(i => new
+                {
+                    i.ScheduledAt,
+                    i.DurationMinutes
+                })
+                .ToListAsync();
+
+            var hasConflict = possibleConflicts.Any(i =>
+                i.ScheduledAt.AddMinutes(i.DurationMinutes) > requestedStart);
+
+            if (hasConflict)
+            {
+                ModelState.AddModelError(
+                    nameof(model.InterviewerId),
+                    "This interviewer is unavailable during the selected time. Please choose another interviewer.");
+            }
+        }
         if (model.ScheduledAt <= DateTime.Now)
             ModelState.AddModelError(nameof(model.ScheduledAt), "The interview must be scheduled in the future.");
 

@@ -1,87 +1,376 @@
 @model InterviewScheduleViewModel
+
 @{
     ViewData["Title"] = "Schedule Interview";
+
     var application = ViewBag.Application as Application;
-    var stages = ViewBag.Stages as List<InterviewStage> ?? new List<InterviewStage>();
-    var interviewers = ViewBag.Interviewers as List<ApplicationUser> ?? new List<ApplicationUser>();
+
+    var stages = ViewBag.Stages as List<InterviewStage>
+        ?? new List<InterviewStage>();
 }
+
 <div class="container py-4">
+
     <div class="page-heading">
         <div>
             <span class="eyebrow">HR · INTERVIEW</span>
+
             <h1>Schedule interview</h1>
-            <p>@application?.Candidate?.FullName · @application?.Vacancy?.JobTitle</p>
+
+            <p>
+                @application?.Candidate?.FullName
+                ·
+                @application?.Vacancy?.JobTitle
+            </p>
         </div>
     </div>
 
+
     <div class="content-card">
+
         <form asp-action="Schedule" method="post">
+
             @Html.AntiForgeryToken()
+
             <input asp-for="ApplicationId" type="hidden" />
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger">
+            </div>
+
 
             <div class="row g-3">
+
+
+                <!-- INTERVIEW STAGE -->
                 <div class="col-md-6">
-                    <label asp-for="InterviewStageId" class="form-label"></label>
-                    <select asp-for="InterviewStageId" class="form-select">
+
+                    <label asp-for="InterviewStageId"
+                           class="form-label">
+                    </label>
+
+                    <select asp-for="InterviewStageId"
+                            class="form-select">
+
                         @foreach (var stage in stages)
                         {
-                            <option value="@stage.InterviewStageId">@stage.StageOrder. @stage.StageName</option>
+                            <option value="@stage.InterviewStageId">
+                                @stage.StageOrder. @stage.StageName
+                            </option>
                         }
+
                     </select>
-                    <span asp-validation-for="InterviewStageId" class="text-danger small"></span>
+
+                    <span asp-validation-for="InterviewStageId"
+                          class="text-danger small">
+                    </span>
+
                 </div>
 
+
+                <!-- INTERVIEWER -->
                 <div class="col-md-6">
-                    <label asp-for="InterviewerId" class="form-label"></label>
-                    <select asp-for="InterviewerId" class="form-select">
-                        <option value="">Choose interviewer...</option>
-                        @foreach (var person in interviewers)
-                        {
-                            <option value="@person.Id">@person.FullName (@person.Email)</option>
-                        }
+
+                    <label asp-for="InterviewerId"
+                           class="form-label">
+                    </label>
+
+                    <select asp-for="InterviewerId"
+                            class="form-select"
+                            id="interviewerSelect">
+
+                        <option value="">
+                            Choose interviewer...
+                        </option>
+
                     </select>
-                    <span asp-validation-for="InterviewerId" class="text-danger small"></span>
+
+                    <div id="availabilityMessage"
+                         class="form-text mt-1">
+
+                        Select a date and time to check interviewer availability.
+
+                    </div>
+
+                    <span asp-validation-for="InterviewerId"
+                          class="text-danger small">
+                    </span>
+
                 </div>
 
+
+                <!-- DATE & TIME -->
                 <div class="col-md-6">
-                    <label asp-for="ScheduledAt" class="form-label"></label>
-                    <input asp-for="ScheduledAt" type="datetime-local" class="form-control"
+
+                    <label asp-for="ScheduledAt"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="ScheduledAt"
+                           type="datetime-local"
+                           class="form-control"
+                           id="scheduledAtInput"
                            value="@Model.ScheduledAt.ToString("yyyy-MM-ddTHH:mm")" />
-                    <span asp-validation-for="ScheduledAt" class="text-danger small"></span>
+
+                    <span asp-validation-for="ScheduledAt"
+                          class="text-danger small">
+                    </span>
+
                 </div>
 
+
+                <!-- DURATION -->
                 <div class="col-md-6">
-                    <label asp-for="DurationMinutes" class="form-label"></label>
-                    <input asp-for="DurationMinutes" type="number" min="15" max="480" class="form-control" />
-                    <span asp-validation-for="DurationMinutes" class="text-danger small"></span>
+
+                    <label asp-for="DurationMinutes"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="DurationMinutes"
+                           type="number"
+                           min="15"
+                           max="480"
+                           class="form-control"
+                           id="durationInput" />
+
+                    <span asp-validation-for="DurationMinutes"
+                          class="text-danger small">
+                    </span>
+
                 </div>
 
+
+                <!-- LOCATION -->
                 <div class="col-12">
-                    <label asp-for="LocationOrMeetingLink" class="form-label"></label>
-                    <input asp-for="LocationOrMeetingLink" class="form-control" placeholder="Meeting Room 2 or Teams/Zoom link" />
-                    <span asp-validation-for="LocationOrMeetingLink" class="text-danger small"></span>
+
+                    <label asp-for="LocationOrMeetingLink"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="LocationOrMeetingLink"
+                           class="form-control"
+                           placeholder="Meeting Room 2 or Teams/Zoom link" />
+
+                    <span asp-validation-for="LocationOrMeetingLink"
+                          class="text-danger small">
+                    </span>
+
                 </div>
 
+
+                <!-- NOTES -->
                 <div class="col-12">
-                    <label asp-for="Notes" class="form-label"></label>
-                    <textarea asp-for="Notes" rows="4" class="form-control" placeholder="Optional instructions for the interviewer"></textarea>
-                    <span asp-validation-for="Notes" class="text-danger small"></span>
+
+                    <label asp-for="Notes"
+                           class="form-label">
+                    </label>
+
+                    <textarea asp-for="Notes"
+                              rows="4"
+                              class="form-control"
+                              placeholder="Optional instructions for the interviewer">
+                    </textarea>
+
+                    <span asp-validation-for="Notes"
+                          class="text-danger small">
+                    </span>
+
                 </div>
+
             </div>
+
 
             @if (application?.Vacancy?.RequireFeedbackBeforeAdvance == true)
             {
                 <div class="alert alert-info mt-4 mb-0">
+
                     <i class="bi bi-lock me-2"></i>
-                    This vacancy requires feedback from the previous stage before a candidate can advance.
+
+                    This vacancy requires feedback from the previous stage
+                    before a candidate can advance.
+
                 </div>
             }
 
+
             <div class="mt-4">
-                <button class="btn btn-primary">Schedule interview</button>
-                <a asp-controller="Application" asp-action="Details" asp-route-id="@Model.ApplicationId" class="btn btn-light ms-2">Cancel</a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    Schedule interview
+
+                </button>
+
+                <a asp-controller="Application"
+                   asp-action="Details"
+                   asp-route-id="@Model.ApplicationId"
+                   class="btn btn-light ms-2">
+
+                    Cancel
+
+                </a>
+
             </div>
+
         </form>
+
     </div>
+
 </div>
+
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const dateInput =
+                document.getElementById("scheduledAtInput");
+
+            const durationInput =
+                document.getElementById("durationInput");
+
+            const interviewerSelect =
+                document.getElementById("interviewerSelect");
+
+            const availabilityMessage =
+                document.getElementById("availabilityMessage");
+
+
+            async function loadAvailableInterviewers() {
+
+                const scheduledAt = dateInput.value;
+                const durationMinutes = durationInput.value;
+
+
+                if (!scheduledAt || !durationMinutes) {
+
+                    interviewerSelect.innerHTML =
+                        '<option value="">Choose interviewer...</option>';
+
+                    availabilityMessage.textContent =
+                        "Select a date and time to check interviewer availability.";
+
+                    return;
+                }
+
+
+                availabilityMessage.textContent =
+                    "Checking interviewer availability...";
+
+
+                try {
+
+                    const url =
+                        '@Url.Action("AvailableInterviewers", "Interview")'
+                        + '?scheduledAt='
+                        + encodeURIComponent(scheduledAt)
+                        + '&durationMinutes='
+                        + encodeURIComponent(durationMinutes);
+
+
+                    const response = await fetch(url);
+
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "Unable to check interviewer availability."
+                        );
+                    }
+
+
+                    const interviewers =
+                        await response.json();
+
+
+                    interviewerSelect.innerHTML =
+                        '<option value="">Choose interviewer...</option>';
+
+
+                    let availableCount = 0;
+
+
+                    interviewers.forEach(person => {
+
+                        const option =
+                            document.createElement("option");
+
+
+                        option.value = person.id;
+
+
+                        if (person.isAvailable) {
+
+                            option.textContent =
+                                "🟢 "
+                                + person.name
+                                + " - Available";
+
+                            availableCount++;
+
+                        }
+                        else {
+
+                            option.textContent =
+                                "🔴 "
+                                + person.name
+                                + " - Unavailable";
+
+                            option.disabled = true;
+
+                        }
+
+
+                        interviewerSelect.appendChild(option);
+
+                    });
+
+
+                    if (availableCount > 0) {
+
+                        availabilityMessage.textContent =
+                            availableCount
+                            + " interviewer(s) available for the selected time.";
+
+                    }
+                    else {
+
+                        availabilityMessage.textContent =
+                            "No interviewers are available. Please select another date or time.";
+
+                    }
+
+                }
+                catch (error) {
+
+                    console.error(error);
+
+                    availabilityMessage.textContent =
+                        "Unable to check interviewer availability.";
+
+                }
+
+            }
+
+
+            dateInput.addEventListener(
+                "change",
+                loadAvailableInterviewers
+            );
+
+
+            durationInput.addEventListener(
+                "change",
+                loadAvailableInterviewers
+            );
+
+
+            loadAvailableInterviewers();
+
+        });
+
+    </script>
+
+}

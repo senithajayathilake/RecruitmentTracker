@@ -1,28 +1,58 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using RecruitmentTracker.Models;
 
 namespace RecruitmentTracker.Services;
 
 public class AiCvScreeningService : IAiCvScreeningService
 {
-    // Common skill aliases.
-    // This prevents things like "ML" and "Machine Learning"
-    // from being treated as completely different skills.
+    // =========================================================
+    // SKILL ALIASES
+    // =========================================================
+
     private static readonly Dictionary<string, string[]> SkillAliases =
         new(StringComparer.OrdinalIgnoreCase)
         {
-            ["python"] = new[] { "python", "python3" },
-            ["java"] = new[] { "java" },
-            ["c#"] = new[] { "c#", "c sharp", "csharp" },
-            ["c++"] = new[] { "c++", "cpp" },
-            ["javascript"] = new[] { "javascript", "js" },
-            ["typescript"] = new[] { "typescript", "ts" },
+            ["python"] = new[]
+            {
+                "python",
+                "python3"
+            },
+
+            ["java"] = new[]
+            {
+                "java"
+            },
+
+            ["c#"] = new[]
+            {
+                "c#",
+                "c sharp",
+                "csharp"
+            },
+
+            ["c++"] = new[]
+            {
+                "c++",
+                "cpp"
+            },
+
+            ["javascript"] = new[]
+            {
+                "javascript",
+                "js"
+            },
+
+            ["typescript"] = new[]
+            {
+                "typescript",
+                "ts"
+            },
 
             ["machine learning"] = new[]
             {
                 "machine learning",
-                "ml",
-                "machine-learning"
+                "machine-learning",
+                "ml"
             },
 
             ["deep learning"] = new[]
@@ -41,8 +71,7 @@ public class AiCvScreeningService : IAiCvScreeningService
             {
                 "data analysis",
                 "data analytics",
-                "data analyst",
-                "data analysis"
+                "data analyst"
             },
 
             ["data science"] = new[]
@@ -54,6 +83,7 @@ public class AiCvScreeningService : IAiCvScreeningService
             ["sql"] = new[]
             {
                 "sql",
+                "sql server",
                 "structured query language"
             },
 
@@ -113,7 +143,6 @@ public class AiCvScreeningService : IAiCvScreeningService
             ["computer vision"] = new[]
             {
                 "computer vision",
-                "cv",
                 "image processing"
             },
 
@@ -162,7 +191,8 @@ public class AiCvScreeningService : IAiCvScreeningService
             ["azure"] = new[]
             {
                 "azure",
-                "microsoft azure"
+                "microsoft azure",
+                "azure devops"
             },
 
             ["aws"] = new[]
@@ -197,73 +227,124 @@ public class AiCvScreeningService : IAiCvScreeningService
             }
         };
 
-    private static readonly string[] EducationKeywords =
-    {
-        "computer science",
-        "software engineering",
-        "information technology",
-        "information systems",
-        "data science",
-        "artificial intelligence",
-        "machine learning",
-        "cyber security",
-        "cybersecurity",
-        "computer engineering",
-        "statistics",
-        "mathematics",
-        "engineering"
-    };
+
+    // =========================================================
+    // MAIN SCREENING METHOD
+    // =========================================================
 
     public Task<AiScreeningResult> ScreenAsync(
         Candidate candidate,
         Vacancy vacancy,
         CandidateCv cv)
     {
-        var cvText = cv.ExtractedText ?? string.Empty;
+        var cvText =
+            cv.ExtractedText ?? string.Empty;
 
-        var candidateText = Normalize(
-            $"{candidate.FullName} " +
-            $"{candidate.Skills} " +
-            $"{candidate.HighestQualification} " +
-            $"{candidate.YearsOfExperience} years " +
-            $"{cvText}");
 
-        var vacancyText = Normalize(
-            $"{vacancy.JobTitle} " +
-            $"{vacancy.Department} " +
-            $"{vacancy.Description} " +
-            $"{vacancy.Requirements}");
+        // =====================================================
+        // CANDIDATE EXPERIENCE
+        // =====================================================
 
-        // ---------------------------------------------------------
-        // 1. Extract skills from the vacancy
-        // ---------------------------------------------------------
+        // Prefer candidate profile data if available.
+        // Otherwise fall back to information extracted from CV.
 
-        var requiredSkills = FindSkills(vacancyText);
+        var candidateExperience =
+            candidate.YearsOfExperience > 0
+                ? candidate.YearsOfExperience
+                : ExtractCandidateExperience(cvText);
 
-        // ---------------------------------------------------------
-        // 2. Find skills present in the CV
-        // ---------------------------------------------------------
 
-        var candidateSkills = FindSkills(candidateText);
+        // =====================================================
+        // CANDIDATE EDUCATION
+        // =====================================================
 
-        var matchedSkills = requiredSkills
-            .Where(candidateSkills.Contains)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        var detectedEducationFields =
+            DetectEducationFields(cvText);
 
-        var missingSkills = requiredSkills
-            .Where(skill => !candidateSkills.Contains(skill))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
 
-        // ---------------------------------------------------------
-        // 3. Skill score
-        // ---------------------------------------------------------
+        var candidateQualification =
+            !string.IsNullOrWhiteSpace(
+                candidate.HighestQualification)
+                ? candidate.HighestQualification
+                : string.Join(
+                    ", ",
+                    detectedEducationFields);
+
+
+        // =====================================================
+        // BUILD CANDIDATE TEXT
+        // =====================================================
+
+        var candidateText =
+            Normalize(
+                $"{candidate.FullName} " +
+                $"{candidate.Skills} " +
+                $"{candidateQualification} " +
+                $"{candidateExperience} years " +
+                $"{cvText}");
+
+
+        // =====================================================
+        // BUILD VACANCY TEXT
+        // =====================================================
+
+        var vacancyText =
+            Normalize(
+                $"{vacancy.JobTitle} " +
+                $"{vacancy.Department} " +
+                $"{vacancy.Description} " +
+                $"{vacancy.Requirements}");
+
+
+        // =====================================================
+        // 1. REQUIRED SKILLS
+        // =====================================================
+
+        var requiredSkills =
+            FindSkills(
+                vacancyText);
+
+
+        // =====================================================
+        // 2. CANDIDATE SKILLS
+        // =====================================================
+
+        var candidateSkills =
+            FindSkills(
+                candidateText);
+
+
+        var matchedSkills =
+            requiredSkills
+                .Where(
+                    candidateSkills.Contains)
+                .Distinct(
+                    StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+
+        var missingSkills =
+            requiredSkills
+                .Where(
+                    skill =>
+                        !candidateSkills.Contains(skill))
+                .Distinct(
+                    StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+
+        // =====================================================
+        // 3. SKILL MATCH SCORE
+        // =====================================================
 
         double skillScore;
 
+
         if (requiredSkills.Count == 0)
         {
+            // No specific technical skills were entered
+            // by HR, so use a neutral score.
+
             skillScore = 70;
         }
         else
@@ -274,45 +355,55 @@ public class AiCvScreeningService : IAiCvScreeningService
                 100;
         }
 
-        // ---------------------------------------------------------
-        // 4. Experience score
-        // ---------------------------------------------------------
+
+        // =====================================================
+        // 4. EXPERIENCE SCORE
+        // =====================================================
 
         var requiredExperience =
-            ExtractExperienceRequirement(vacancyText);
+            ExtractExperienceRequirement(
+                vacancyText);
+
 
         double experienceScore;
 
+
         if (requiredExperience <= 0)
         {
-            // If the vacancy does not specify experience,
-            // don't punish the candidate.
+            // Do not punish candidates when the vacancy
+            // has no minimum experience requirement.
+
             experienceScore = 85;
         }
-        else if (candidate.YearsOfExperience >= requiredExperience)
+        else if (
+            candidateExperience >=
+            requiredExperience)
         {
             experienceScore = 100;
         }
         else
         {
             experienceScore =
-                (double)candidate.YearsOfExperience /
+                (double)candidateExperience /
                 requiredExperience *
                 100;
         }
 
-        // ---------------------------------------------------------
-        // 5. Education score
-        // ---------------------------------------------------------
+
+        // =====================================================
+        // 5. EDUCATION SCORE
+        // =====================================================
 
         var educationScore =
             CalculateEducationScore(
                 candidate.HighestQualification,
+                cvText,
                 vacancyText);
 
-        // ---------------------------------------------------------
-        // 6. Job relevance score
-        // ---------------------------------------------------------
+
+        // =====================================================
+        // 6. GENERAL JOB RELEVANCE
+        // =====================================================
 
         var relevanceScore =
             CalculateRelevanceScore(
@@ -320,9 +411,20 @@ public class AiCvScreeningService : IAiCvScreeningService
                 candidateText,
                 candidateSkills);
 
-        // ---------------------------------------------------------
-        // 7. Additional skills score
-        // ---------------------------------------------------------
+
+        // =====================================================
+        // 7. CV ↔ JOB TEXT SIMILARITY
+        // =====================================================
+
+        var textSimilarityScore =
+            CalculateTextSimilarity(
+                cvText,
+                vacancyText);
+
+
+        // =====================================================
+        // 8. ADDITIONAL SKILLS
+        // =====================================================
 
         var additionalSkills =
             candidateSkills
@@ -332,28 +434,49 @@ public class AiCvScreeningService : IAiCvScreeningService
                 .Take(10)
                 .ToList();
 
-        var additionalSkillsScore =
-            additionalSkills.Count > 0 ? 100 : 60;
 
-        // ---------------------------------------------------------
-        // 8. Final weighted score
-        // ---------------------------------------------------------
+        var additionalSkillsScore =
+            additionalSkills.Count > 0
+                ? 100
+                : 60;
+
+
+        // =====================================================
+        // 9. FINAL WEIGHTED SCORE
+        // =====================================================
+
+        /*
+            Skills match            35%
+            CV-job similarity       25%
+            Experience              15%
+            Education               10%
+            General job relevance   10%
+            Additional skills        5%
+
+            TOTAL                  100%
+        */
 
         var finalScore =
-            skillScore * 0.40 +
-            experienceScore * 0.25 +
-            educationScore * 0.15 +
-            relevanceScore * 0.15 +
+            skillScore * 0.35 +
+            textSimilarityScore * 0.25 +
+            experienceScore * 0.15 +
+            educationScore * 0.10 +
+            relevanceScore * 0.10 +
             additionalSkillsScore * 0.05;
 
-        finalScore = Math.Clamp(
-            Math.Round(finalScore, 1),
-            0,
-            100);
 
-        // ---------------------------------------------------------
-        // 9. Recommendation
-        // ---------------------------------------------------------
+        finalScore =
+            Math.Clamp(
+                Math.Round(
+                    finalScore,
+                    1),
+                0,
+                100);
+
+
+        // =====================================================
+        // 10. RECOMMENDATION
+        // =====================================================
 
         var recommendation =
             finalScore >= 85
@@ -364,157 +487,526 @@ public class AiCvScreeningService : IAiCvScreeningService
                         ? "Review"
                         : "Low match";
 
-        // ---------------------------------------------------------
-        // 10. Generate explanation
-        // ---------------------------------------------------------
+
+        // =====================================================
+        // 11. EXPLANATION
+        // =====================================================
 
         var summary =
             BuildSummary(
                 finalScore,
                 matchedSkills,
                 missingSkills,
+                skillScore,
+                textSimilarityScore,
                 experienceScore,
                 educationScore,
                 relevanceScore,
-                candidate.YearsOfExperience,
+                candidateExperience,
                 requiredExperience);
+
+
+        // =====================================================
+        // DEBUG INFORMATION
+        // =====================================================
+
+        System.Diagnostics.Debug.WriteLine(
+            $"AI SCREENING DEBUG | " +
+            $"CV: {cv.FileName} | " +
+            $"CV characters: {cvText.Length} | " +
+            $"Experience detected: {candidateExperience} | " +
+            $"Education: {educationScore:0}% | " +
+            $"Skills: {skillScore:0}% | " +
+            $"Similarity: {textSimilarityScore:0}% | " +
+            $"Final score: {finalScore:0.0}%");
+
+
+        // =====================================================
+        // RETURN RESULT
+        // =====================================================
 
         return Task.FromResult(
             new AiScreeningResult
             {
-                Score = finalScore,
+                Score =
+                    finalScore,
 
                 MatchedSkills =
-                    string.Join(", ", matchedSkills),
+                    string.Join(
+                        ", ",
+                        matchedSkills),
 
                 MissingSkills =
-                    string.Join(", ", missingSkills),
+                    string.Join(
+                        ", ",
+                        missingSkills),
 
-                Summary = summary,
+                Summary =
+                    summary,
 
                 Recommendation =
                     recommendation
             });
     }
 
+
     // =========================================================
     // SKILL DETECTION
     // =========================================================
 
-    private static HashSet<string> FindSkills(string text)
+    private static HashSet<string> FindSkills(
+        string text)
     {
         var result =
             new HashSet<string>(
                 StringComparer.OrdinalIgnoreCase);
 
+
         foreach (var skill in SkillAliases)
         {
             foreach (var alias in skill.Value)
             {
-                if (ContainsPhrase(text, alias))
+                if (
+                    ContainsPhrase(
+                        text,
+                        alias))
                 {
-                    result.Add(skill.Key);
+                    result.Add(
+                        skill.Key);
+
                     break;
                 }
             }
         }
 
+
         return result;
     }
+
 
     private static bool ContainsPhrase(
         string text,
         string phrase)
     {
-        if (string.IsNullOrWhiteSpace(text) ||
+        if (
+            string.IsNullOrWhiteSpace(text) ||
             string.IsNullOrWhiteSpace(phrase))
         {
             return false;
         }
 
+
         var escaped =
             Regex.Escape(
                 Normalize(phrase));
 
+
         return Regex.IsMatch(
-            text,
+            Normalize(text),
             $@"(?<![a-z0-9]){escaped}(?![a-z0-9])",
             RegexOptions.IgnoreCase);
     }
 
-   
+
+    // =========================================================
+    // VACANCY EXPERIENCE REQUIREMENT
+    // =========================================================
 
     private static int ExtractExperienceRequirement(
         string text)
     {
-        var patterns = new[]
+        if (string.IsNullOrWhiteSpace(text))
         {
-            @"(\d+)\s*\+?\s*(?:years?|yrs?)\s*(?:of)?\s*experience",
+            return 0;
+        }
 
-            @"experience\s*(?:of|:)?\s*(\d+)\s*\+?\s*(?:years?|yrs?)",
 
-            @"minimum\s*(?:of)?\s*(\d+)\s*\+?\s*(?:years?|yrs?)",
+        var normalized =
+            Normalize(text);
 
-            @"at\s*least\s*(\d+)\s*\+?\s*(?:years?|yrs?)"
-        };
+
+        var numberPattern =
+            @"(\d+|one|two|three|four|five|six|seven|eight|nine|ten)";
+
+
+        var patterns =
+            new[]
+            {
+                $@"{numberPattern}\s*\+?\s*(?:years?|yrs?)\s*(?:of\s+)?experience",
+
+                $@"experience\s*(?:of|:)?\s*{numberPattern}\s*\+?\s*(?:years?|yrs?)",
+
+                $@"minimum\s*(?:of\s+)?{numberPattern}\s*\+?\s*(?:years?|yrs?)",
+
+                $@"at\s*least\s*{numberPattern}\s*\+?\s*(?:years?|yrs?)"
+            };
+
 
         foreach (var pattern in patterns)
         {
             var match =
                 Regex.Match(
-                    text,
+                    normalized,
                     pattern,
                     RegexOptions.IgnoreCase);
 
-            if (match.Success &&
-                int.TryParse(
-                    match.Groups[1].Value,
-                    out var years))
+
+            if (match.Success)
             {
-                return years;
+                var years =
+                    ParseExperienceNumber(
+                        match.Groups[1].Value);
+
+
+                if (years > 0)
+                {
+                    return years;
+                }
             }
         }
+
 
         return 0;
     }
 
+
     // =========================================================
-    // EDUCATION
+    // CANDIDATE EXPERIENCE FROM CV
+    // =========================================================
+
+    private static int ExtractCandidateExperience(
+        string cvText)
+    {
+        if (string.IsNullOrWhiteSpace(cvText))
+        {
+            return 0;
+        }
+
+
+        var normalized =
+            Normalize(cvText);
+
+
+        var numberPattern =
+            @"(\d+|one|two|three|four|five|six|seven|eight|nine|ten)";
+
+
+        var patterns =
+            new[]
+            {
+                $@"{numberPattern}\s*\+?\s*(?:years?|yrs?)\s*(?:of\s+)?(?:professional\s+)?experience",
+
+                $@"{numberPattern}\s*\+?\s*(?:years?|yrs?)\s+(?:professional\s+)?experience",
+
+                $@"experience\s*(?:of|:)?\s*{numberPattern}\s*\+?\s*(?:years?|yrs?)"
+            };
+
+
+        foreach (var pattern in patterns)
+        {
+            var match =
+                Regex.Match(
+                    normalized,
+                    pattern,
+                    RegexOptions.IgnoreCase);
+
+
+            if (match.Success)
+            {
+                var years =
+                    ParseExperienceNumber(
+                        match.Groups[1].Value);
+
+
+                if (years > 0)
+                {
+                    return years;
+                }
+            }
+        }
+
+
+        return 0;
+    }
+
+
+    private static int ParseExperienceNumber(
+        string value)
+    {
+        if (
+            int.TryParse(
+                value,
+                out var numericValue))
+        {
+            return numericValue;
+        }
+
+
+        return value
+            .Trim()
+            .ToLowerInvariant()
+            switch
+        {
+            "one" => 1,
+            "two" => 2,
+            "three" => 3,
+            "four" => 4,
+            "five" => 5,
+            "six" => 6,
+            "seven" => 7,
+            "eight" => 8,
+            "nine" => 9,
+            "ten" => 10,
+            _ => 0
+        };
+    }
+
+
+    // =========================================================
+    // EDUCATION FIELD DETECTION
+    // =========================================================
+
+    private static List<string> DetectEducationFields(
+        string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return new List<string>();
+        }
+
+
+        var normalized =
+            Normalize(text);
+
+
+        // This version removes spaces/punctuation.
+        // It helps when PDF extraction produces text such as:
+        //
+        // "SoftwareEngineering"
+        //
+        // instead of:
+        //
+        // "Software Engineering"
+
+        var compact =
+            Regex.Replace(
+                normalized,
+                @"[^a-z0-9]",
+                "");
+
+
+        var fields =
+            new List<string>();
+
+
+        if (
+            normalized.Contains(
+                "software engineering") ||
+            compact.Contains(
+                "softwareengineering"))
+        {
+            fields.Add(
+                "software engineering");
+        }
+
+
+        if (
+            normalized.Contains(
+                "computer science") ||
+            compact.Contains(
+                "computerscience"))
+        {
+            fields.Add(
+                "computer science");
+        }
+
+
+        if (
+            normalized.Contains(
+                "information technology") ||
+            compact.Contains(
+                "informationtechnology"))
+        {
+            fields.Add(
+                "information technology");
+        }
+
+
+        if (
+            normalized.Contains(
+                "information systems") ||
+            compact.Contains(
+                "informationsystems"))
+        {
+            fields.Add(
+                "information systems");
+        }
+
+
+        if (
+            normalized.Contains(
+                "artificial intelligence") ||
+            compact.Contains(
+                "artificialintelligence"))
+        {
+            fields.Add(
+                "artificial intelligence");
+        }
+
+
+        if (
+            normalized.Contains(
+                "data science") ||
+            compact.Contains(
+                "datascience"))
+        {
+            fields.Add(
+                "data science");
+        }
+
+
+        if (
+            normalized.Contains(
+                "machine learning") ||
+            compact.Contains(
+                "machinelearning"))
+        {
+            fields.Add(
+                "machine learning");
+        }
+
+
+        if (
+            normalized.Contains(
+                "computer engineering") ||
+            compact.Contains(
+                "computerengineering"))
+        {
+            fields.Add(
+                "computer engineering");
+        }
+
+
+        if (
+            normalized.Contains(
+                "cyber security") ||
+            normalized.Contains(
+                "cybersecurity") ||
+            compact.Contains(
+                "cybersecurity"))
+        {
+            fields.Add(
+                "cyber security");
+        }
+
+
+        if (
+            normalized.Contains(
+                "statistics") ||
+            compact.Contains(
+                "statistics"))
+        {
+            fields.Add(
+                "statistics");
+        }
+
+
+        if (
+            normalized.Contains(
+                "mathematics") ||
+            compact.Contains(
+                "mathematics"))
+        {
+            fields.Add(
+                "mathematics");
+        }
+
+
+        return fields
+            .Distinct(
+                StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+
+    // =========================================================
+    // EDUCATION SCORE
     // =========================================================
 
     private static double CalculateEducationScore(
-        string? qualification,
+        string? profileQualification,
+        string cvText,
         string vacancyText)
     {
-        if (string.IsNullOrWhiteSpace(qualification))
+        // Use both profile information AND uploaded CV.
+
+        var candidateEducationText =
+            $"{profileQualification} {cvText}";
+
+
+        var candidateFields =
+            DetectEducationFields(
+                candidateEducationText);
+
+
+        var vacancyFields =
+            DetectEducationFields(
+                vacancyText);
+
+
+        System.Diagnostics.Debug.WriteLine(
+            $"EDUCATION DEBUG | " +
+            $"Candidate fields: " +
+            $"{string.Join(", ", candidateFields)} | " +
+            $"Vacancy fields: " +
+            $"{string.Join(", ", vacancyFields)}");
+
+
+        // No recognizable relevant education
+        // was found.
+
+        if (candidateFields.Count == 0)
         {
             return 50;
         }
 
-        var qualificationText =
-            Normalize(qualification);
 
-        var relevant =
-            EducationKeywords.Any(
-                keyword =>
-                    ContainsPhrase(
-                        qualificationText,
-                        keyword));
+        // Candidate has a relevant technical degree,
+        // but vacancy does not specify a particular
+        // discipline.
 
-        // If the qualification is relevant to the general
-        // vacancy domain, give a stronger score.
-        if (relevant)
+        if (vacancyFields.Count == 0)
+        {
+            return 90;
+        }
+
+
+        // Check whether candidate's degree matches one of
+        // the disciplines accepted by the vacancy.
+
+        var directMatch =
+            candidateFields.Any(
+                candidateField =>
+                    vacancyFields.Contains(
+                        candidateField,
+                        StringComparer.OrdinalIgnoreCase));
+
+
+        if (directMatch)
         {
             return 100;
         }
 
-        // Candidate has a qualification, but it isn't clearly
-        // related to the job.
-        return 75;
+
+        // Candidate still has a relevant computing /
+        // technical qualification.
+
+        return 85;
     }
 
+
     // =========================================================
-    // JOB RELEVANCE
+    // GENERAL JOB RELEVANCE
     // =========================================================
 
     private static double CalculateRelevanceScore(
@@ -523,15 +1015,19 @@ public class AiCvScreeningService : IAiCvScreeningService
         HashSet<string> candidateSkills)
     {
         var titleWords =
-            GetImportantWords(vacancy.JobTitle);
+            GetImportantWords(
+                vacancy.JobTitle);
+
 
         var descriptionWords =
             GetImportantWords(
                 vacancy.Description);
 
+
         var requirementWords =
             GetImportantWords(
                 vacancy.Requirements);
+
 
         var titleMatches =
             titleWords.Count == 0
@@ -542,6 +1038,7 @@ public class AiCvScreeningService : IAiCvScreeningService
                             candidateText,
                             word));
 
+
         var descriptionMatches =
             descriptionWords.Count == 0
                 ? 0
@@ -550,6 +1047,7 @@ public class AiCvScreeningService : IAiCvScreeningService
                         ContainsPhrase(
                             candidateText,
                             word));
+
 
         var requirementMatches =
             requirementWords.Count == 0
@@ -560,12 +1058,14 @@ public class AiCvScreeningService : IAiCvScreeningService
                             candidateText,
                             word));
 
+
         var titleScore =
             titleWords.Count == 0
                 ? 70
                 : (double)titleMatches /
                   titleWords.Count *
                   100;
+
 
         var descriptionScore =
             descriptionWords.Count == 0
@@ -574,6 +1074,7 @@ public class AiCvScreeningService : IAiCvScreeningService
                   descriptionWords.Count *
                   100;
 
+
         var requirementScore =
             requirementWords.Count == 0
                 ? 70
@@ -581,10 +1082,12 @@ public class AiCvScreeningService : IAiCvScreeningService
                   requirementWords.Count *
                   100;
 
+
         var skillBonus =
             Math.Min(
                 20,
                 candidateSkills.Count * 2);
+
 
         var score =
             titleScore * 0.35 +
@@ -592,11 +1095,13 @@ public class AiCvScreeningService : IAiCvScreeningService
             requirementScore * 0.25 +
             skillBonus * 0.15;
 
+
         return Math.Clamp(
             score,
             0,
             100);
     }
+
 
     // =========================================================
     // IMPORTANT WORDS
@@ -609,6 +1114,7 @@ public class AiCvScreeningService : IAiCvScreeningService
         {
             return new List<string>();
         }
+
 
         var stopWords =
             new HashSet<string>(
@@ -661,9 +1167,10 @@ public class AiCvScreeningService : IAiCvScreeningService
                 "familiarity"
             };
 
+
         return Regex
             .Split(
-                text.ToLowerInvariant(),
+                Normalize(text),
                 @"[^a-z0-9+#.]+")
             .Where(
                 word =>
@@ -675,6 +1182,170 @@ public class AiCvScreeningService : IAiCvScreeningService
             .ToList();
     }
 
+
+    // =========================================================
+    // CV ↔ JOB TEXT SIMILARITY
+    // =========================================================
+
+    private static double CalculateTextSimilarity(
+        string cvText,
+        string vacancyText)
+    {
+        if (
+            string.IsNullOrWhiteSpace(cvText) ||
+            string.IsNullOrWhiteSpace(vacancyText))
+        {
+            return 0;
+        }
+
+
+        var cvWords =
+            GetWordFrequencies(
+                cvText);
+
+
+        var vacancyWords =
+            GetWordFrequencies(
+                vacancyText);
+
+
+        if (
+            cvWords.Count == 0 ||
+            vacancyWords.Count == 0)
+        {
+            return 0;
+        }
+
+
+        var allWords =
+            cvWords.Keys
+                .Union(
+                    vacancyWords.Keys)
+                .ToList();
+
+
+        double dotProduct = 0;
+        double cvMagnitude = 0;
+        double vacancyMagnitude = 0;
+
+
+        foreach (var word in allWords)
+        {
+            var cvCount =
+                cvWords.TryGetValue(
+                    word,
+                    out var cvValue)
+                    ? cvValue
+                    : 0;
+
+
+            var vacancyCount =
+                vacancyWords.TryGetValue(
+                    word,
+                    out var vacancyValue)
+                    ? vacancyValue
+                    : 0;
+
+
+            dotProduct +=
+                cvCount *
+                vacancyCount;
+
+
+            cvMagnitude +=
+                cvCount *
+                cvCount;
+
+
+            vacancyMagnitude +=
+                vacancyCount *
+                vacancyCount;
+        }
+
+
+        if (
+            cvMagnitude == 0 ||
+            vacancyMagnitude == 0)
+        {
+            return 0;
+        }
+
+
+        var similarity =
+            dotProduct /
+            (
+                Math.Sqrt(cvMagnitude) *
+                Math.Sqrt(vacancyMagnitude)
+            );
+
+
+        return Math.Clamp(
+            similarity * 100,
+            0,
+            100);
+    }
+
+
+    // =========================================================
+    // WORD FREQUENCY
+    // =========================================================
+
+    private static Dictionary<string, int>
+        GetWordFrequencies(
+            string text)
+    {
+        var stopWords =
+            new HashSet<string>(
+                StringComparer.OrdinalIgnoreCase)
+            {
+                "and",
+                "or",
+                "the",
+                "a",
+                "an",
+                "with",
+                "for",
+                "to",
+                "of",
+                "in",
+                "on",
+                "at",
+                "is",
+                "are",
+                "be",
+                "this",
+                "that",
+                "from",
+                "as",
+                "by",
+                "will",
+                "must",
+                "have",
+                "has",
+                "candidate",
+                "job",
+                "role"
+            };
+
+
+        return Regex
+            .Split(
+                Normalize(text),
+                @"[^a-z0-9+#.]+")
+            .Where(
+                word =>
+                    word.Length >= 2 &&
+                    !stopWords.Contains(word))
+            .GroupBy(
+                word => word,
+                StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Count(),
+                StringComparer.OrdinalIgnoreCase);
+    }
+
+
     // =========================================================
     // SUMMARY
     // =========================================================
@@ -683,6 +1354,8 @@ public class AiCvScreeningService : IAiCvScreeningService
         double score,
         List<string> matched,
         List<string> missing,
+        double skillScore,
+        double textSimilarityScore,
         double experienceScore,
         double educationScore,
         double relevanceScore,
@@ -696,15 +1369,18 @@ public class AiCvScreeningService : IAiCvScreeningService
                     ? $"The candidate meets the required experience of {requiredExperience} year(s)."
                     : $"The candidate has {candidateExperience} year(s) of experience compared with the required {requiredExperience} year(s).";
 
+
         var skillText =
             matched.Count > 0
                 ? $"The candidate matches {matched.Count} identified job skill(s)"
                 : "The candidate has limited matches against the identified job skills";
 
+
         var missingText =
             missing.Count > 0
                 ? $"and is missing {missing.Count} identified skill(s)."
                 : "and no major identified skills are missing.";
+
 
         var overall =
             score >= 85
@@ -715,38 +1391,54 @@ public class AiCvScreeningService : IAiCvScreeningService
                         ? "Overall, the candidate may require manual review."
                         : "Overall, the candidate has limited alignment with the vacancy.";
 
+
         return
             $"{skillText} {missingText} " +
+            $"Skills match: {skillScore:0}%. " +
+            $"CV-to-job similarity: {textSimilarityScore:0}%. " +
             $"{experienceText} " +
+            $"Experience match: {experienceScore:0}%. " +
             $"Education match: {educationScore:0}%. " +
             $"Job relevance: {relevanceScore:0}%. " +
             overall;
     }
 
+
     // =========================================================
     // TEXT NORMALIZATION
     // =========================================================
 
-    private static string Normalize(string? text)
+    private static string Normalize(
+        string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
             return string.Empty;
         }
 
+
         text =
             text.ToLowerInvariant();
 
+
         text =
-            text.Replace("�", "-")
-                .Replace("�", "-")
-                .Replace("�", "'");
+            text.Replace(
+                    "–",
+                    "-")
+                .Replace(
+                    "—",
+                    "-")
+                .Replace(
+                    "’",
+                    "'");
+
 
         text =
             Regex.Replace(
                 text,
                 @"\s+",
                 " ");
+
 
         return text.Trim();
     }

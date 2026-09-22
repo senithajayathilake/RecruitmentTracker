@@ -274,6 +274,25 @@ a.content-card:hover, .feature-card:hover, .stat-card:hover { transform: transla
 .site-body .form-control::placeholder { color: #79756d; }
 .site-body .form-control:focus, .site-body .form-select:focus, .site-body input[type="file"]:focus { color: #fff; background-color: rgba(255,255,255,.075) !important; border-color: rgba(255,184,0,.62) !important; box-shadow: 0 0 0 .2rem rgba(255,184,0,.10); }
 .site-body .form-select { color-scheme: dark; }
+/* =========================================================
+   DROPDOWN OPTION VISIBILITY FIX
+========================================================= */
+
+.site-body select.form-select option,
+.site-body select.form-select optgroup {
+    background-color: #151515 !important;
+    color: #f7f4eb !important;
+}
+
+    .site-body select.form-select option:checked {
+        background-color: #ffb800 !important;
+        color: #090909 !important;
+    }
+
+    .site-body select.form-select option:disabled {
+        background-color: #151515 !important;
+        color: #77736b !important;
+    }
 .site-body .form-check-input { background-color: rgba(255,255,255,.07); border-color: rgba(255,255,255,.22); }
 .site-body .form-check-input:checked { background-color: var(--gold); border-color: var(--gold); }
 

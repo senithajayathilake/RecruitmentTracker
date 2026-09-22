@@ -41,8 +41,29 @@ public class DashboardViewModel
     public int RejectedCount { get; set; }
     public int UpcomingInterviewCount { get; set; }
     public int PendingFeedbackCount { get; set; }
+
+    // Sprint 2 - Recruitment Bottleneck Monitoring
+    public int AwaitingInterviewCount { get; set; }
+    public int OverdueFeedbackCount { get; set; }
+    public int LongOpenApplicationCount { get; set; }
+
+    public List<RecruitmentBottleneckViewModel> Bottlenecks { get; set; } = new();
+
     public List<Application> RecentApplications { get; set; } = new();
     public List<Interview> UpcomingInterviews { get; set; } = new();
+}
+
+public class RecruitmentBottleneckViewModel
+{
+    public string Type { get; set; } = string.Empty;
+
+    public string CandidateName { get; set; } = string.Empty;
+
+    public string VacancyTitle { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty;
+
+    public int ApplicationId { get; set; }
 }
 
 public class CandidateFilterViewModel
@@ -137,7 +158,16 @@ public class InterviewerDashboardViewModel
 public class CandidateComparisonViewModel
 {
     public List<Vacancy> Vacancies { get; set; } = new();
+
     public Vacancy? SelectedVacancy { get; set; }
+
+    // All candidates available under the selected vacancy
+    public List<CandidateComparisonRowViewModel> AvailableCandidates { get; set; } = new();
+
+    // Application IDs selected by HR / Hiring Manager
+    public List<int> SelectedApplicationIds { get; set; } = new();
+
+    // Candidates actually displayed in the comparison
     public List<CandidateComparisonRowViewModel> Rows { get; set; } = new();
 }
 
