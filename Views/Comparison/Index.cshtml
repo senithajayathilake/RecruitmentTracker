@@ -1,76 +1,578 @@
 @model CandidateComparisonViewModel
+
 @{
     ViewData["Title"] = "Compare Candidates";
 }
+
 <div class="container py-4">
+
+    <!-- PAGE HEADING -->
     <div class="page-heading">
         <div>
             <span class="eyebrow">FAIR COMPARISON</span>
             <h1>Compare candidates</h1>
-            <p>Compare candidates for the same vacancy using consistent evidence.</p>
+            <p>
+                Select candidates from the same vacancy and compare
+                screening and interview evidence side-by-side.
+            </p>
         </div>
     </div>
 
+
+    <!-- STEP 1 - SELECT VACANCY -->
     <div class="content-card mb-4">
-        <form method="get" class="row g-3 align-items-end">
+
+        <h5 class="mb-3">1. Select vacancy</h5>
+
+        <form method="get"
+              asp-controller="Comparison"
+              asp-action="Index"
+              class="row g-3 align-items-end">
+
             <div class="col-md-9">
-                <label class="form-label">Vacancy</label>
-                <select name="vacancyId" class="form-select">
+
+                <label class="form-label">
+                    Vacancy
+                </label>
+
+                <select name="vacancyId"
+                        class="form-select">
+
                     @foreach (var vacancy in Model.Vacancies)
                     {
-                        <option value="@vacancy.VacancyId" selected="@(Model.SelectedVacancy?.VacancyId == vacancy.VacancyId ? "selected" : null)">
+                        <option value="@vacancy.VacancyId"
+                                selected="@(Model.SelectedVacancy?.VacancyId == vacancy.VacancyId ? "selected" : null)">
+
                             @vacancy.JobTitle — @vacancy.Department
+
                         </option>
                     }
+
                 </select>
+
             </div>
-            <div class="col-md-3"><button class="btn btn-primary w-100">Compare</button></div>
+
+            <div class="col-md-3">
+
+                <button type="submit"
+                        class="btn btn-primary w-100">
+
+                    Load candidates
+
+                </button>
+
+            </div>
+
         </form>
+
     </div>
+
 
     @if (Model.SelectedVacancy != null)
     {
-        <div class="content-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div><h5 class="mb-1">@Model.SelectedVacancy.JobTitle</h5><p class="small text-secondary mb-0">AI score is supporting evidence; interview scores use the same 1–5 rubric for each candidate.</p></div>
-                <span class="badge text-bg-primary">@Model.Rows.Count candidates</span>
+        <!-- STEP 2 - SELECT CANDIDATES -->
+        <div class="content-card mb-4">
+
+            <div class="d-flex justify-content-between
+                        align-items-center
+                        flex-wrap
+                        gap-2
+                        mb-3">
+
+                <div>
+
+                    <h5 class="mb-1">
+                        2. Select candidates
+                    </h5>
+
+                    <p class="text-secondary small mb-0">
+                        @Model.SelectedVacancy.JobTitle
+                        · Select at least two candidates for comparison.
+                    </p>
+
+                </div>
+
+                <span class="badge text-bg-primary">
+                    @Model.AvailableCandidates.Count candidates
+                </span>
+
             </div>
 
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
-                        <tr>
-                            <th>Candidate</th>
-                            <th>Experience</th>
-                            <th>AI match</th>
-                            <th>Interview avg.</th>
-                            <th>Latest recommendation</th>
-                            <th>Current stage</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var row in Model.Rows)
-                    {
-                        <tr>
-                            <td><strong>@row.CandidateName</strong><br><small>@row.Email</small><br><small class="text-secondary">@row.Skills</small></td>
-                            <td>@row.YearsOfExperience years</td>
-                            <td><span class="score">@row.AiScore.ToString("0.0")%</span></td>
-                            <td>@(row.InterviewAverage.HasValue ? $"{row.InterviewAverage:0.0} / 5" : "Pending")</td>
-                            <td>@row.LatestRecommendation</td>
-                            <td>@row.CurrentStage</td>
-                            <td><span class="badge text-bg-secondary">@row.Status</span></td>
-                            <td><a asp-controller="Application" asp-action="Details" asp-route-id="@row.ApplicationId" class="btn btn-sm btn-light">Review</a></td>
-                        </tr>
-                    }
-                    @if (!Model.Rows.Any())
-                    {
-                        <tr><td colspan="8" class="text-secondary">No applications for this vacancy yet.</td></tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
+
+            @if (Model.AvailableCandidates.Any())
+            {
+                <form method="get"
+                      asp-controller="Comparison"
+                      asp-action="Index"
+                      id="candidateSelectionForm">
+
+                    <input type="hidden"
+                           name="vacancyId"
+                           value="@Model.SelectedVacancy.VacancyId" />
+
+
+                    <div class="row g-3">
+
+                        @foreach (var candidate in Model.AvailableCandidates)
+                        {
+                            var isSelected =
+                                Model.SelectedApplicationIds
+                                .Contains(candidate.ApplicationId);
+
+                            <div class="col-md-6 col-lg-4">
+
+                                <label class="card h-100 p-3 candidate-select-card">
+
+                                    <div class="d-flex
+                                                justify-content-between
+                                                align-items-start
+                                                gap-2">
+
+                                        <div>
+
+                                            <h6 class="mb-1">
+                                                @candidate.CandidateName
+                                            </h6>
+
+                                            <div class="small text-secondary">
+                                                @candidate.Email
+                                            </div>
+
+                                        </div>
+
+
+                                        <input type="checkbox"
+                                               class="form-check-input candidate-checkbox"
+                                               name="selectedApplicationIds"
+                                               value="@candidate.ApplicationId"
+                                               checked="@isSelected" />
+
+                                    </div>
+
+
+                                    <hr />
+
+
+                                    <div class="small mb-2">
+
+                                        <strong>AI Match:</strong>
+
+                                        <span class="score">
+                                            @candidate.AiScore.ToString("0.0")%
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="small mb-2">
+
+                                        <strong>Experience:</strong>
+
+                                        @candidate.YearsOfExperience years
+
+                                    </div>
+
+
+                                    <div class="small mb-2">
+
+                                        <strong>Interview:</strong>
+
+                                        @if (candidate.InterviewAverage.HasValue)
+                                        {
+                                            <span>
+                                                @candidate.InterviewAverage.Value.ToString("0.0") / 5
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">
+                                                Pending
+                                            </span>
+                                        }
+
+                                    </div>
+
+
+                                    <div class="small">
+
+                                        <strong>Status:</strong>
+
+                                        <span class="badge text-bg-secondary">
+                                            @candidate.Status
+                                        </span>
+
+                                    </div>
+
+                                </label>
+
+                            </div>
+                        }
+
+                    </div>
+
+
+                    <div class="mt-4">
+
+                        <button type="submit"
+                                id="compareSelectedButton"
+                                class="btn btn-primary">
+
+                            Compare selected candidates
+
+                        </button>
+
+                        <span id="candidateSelectionMessage"
+                              class="small text-secondary ms-2">
+                        </span>
+
+                    </div>
+
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-light border mb-0">
+
+                    No candidates are currently available
+                    for this vacancy.
+
+                </div>
+            }
+
         </div>
+
+
+        <!-- STEP 3 - COMPARISON -->
+        @if (Model.Rows.Any())
+        {
+            <div class="content-card">
+
+                <div class="d-flex
+                            justify-content-between
+                            align-items-center
+                            flex-wrap
+                            gap-2
+                            mb-4">
+
+                    <div>
+
+                        <span class="eyebrow">
+                            COMPARISON RESULT
+                        </span>
+
+                        <h4 class="mb-1">
+                            @Model.SelectedVacancy.JobTitle
+                        </h4>
+
+                        <p class="small text-secondary mb-0">
+                            AI screening and interview feedback are
+                            supporting evidence. The final hiring
+                            decision remains with HR / Hiring Manager.
+                        </p>
+
+                    </div>
+
+                    <span class="badge text-bg-primary">
+
+                        @Model.Rows.Count selected
+
+                    </span>
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table class="table
+                                  table-bordered
+                                  align-middle
+                                  text-center">
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="text-start"
+                                    style="min-width:180px;">
+
+                                    Criteria
+
+                                </th>
+
+                                @foreach (var candidate in Model.Rows)
+                                {
+                                    <th style="min-width:220px;">
+
+                                        <div class="fw-bold">
+                                            @candidate.CandidateName
+                                        </div>
+
+                                        <small class="text-secondary">
+                                            @candidate.Email
+                                        </small>
+
+                                    </th>
+                                }
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <!-- AI MATCH -->
+                            <tr>
+
+                                <th class="text-start">
+                                    AI Match
+                                </th>
+
+                                @foreach (var candidate in Model.Rows)
+                                {
+                                    <td>
+
+                                        <span class="score fs-5">
+                                            @candidate.AiScore.ToString("0.0")%
+                                        </span>
+
+                                    </td>
+                                }
+
+                            </tr>
+
+
+                            <!-- EXPERIENCE -->
+                            <tr>
+
+                                <th class="text-start">
+                                    Experience
+                                </th>
+
+                                @foreach (var candidate in Model.Rows)
+                                {
+                                    <td>
+                                        @candidate.YearsOfExperience years
+                                    </td>
+                                }
+
+                            </tr>
+
+
+                            <!-- SKILLS -->
+                            <tr>
+
+                                <th class="text-start">
+                                    Skills
+                                </th>
+
+                                @foreach (var candidate in Model.Rows)
+                                {
+                                    <td class="small">
+                                        @candidate.Skills
+                                    </td>
+                                }
+
+                            </tr>
+
+
+                            <!-- INTERVIEW -->
+                            <tr>
+
+                                <th class="text-start">
+                                    Interview Average
+                                </th>
+
+                                @foreach (var candidate in Model.Rows)
+                                {
+                                    <td>
+
+                                        @if (candidate.InterviewAverage.HasValue)
+                                        {
+                                            <strong>
+                                                @candidate.InterviewAverage.Value.ToString("0.0") / 5
+                                            </strong>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">
+                                                Pending
+                                            </span>
+                                        }
+
+                                    </td>
+                                }
+
+                            </tr>
+
+
+                            <!-- RECOMMENDATION -->
+                            <tr>
+
+                                <th class="text-start">
+                                    Latest Recommendation
+                                </th>
+
+                                @foreach (var candidate in Model.Rows)
+                                {
+                                    <td>
+                                        @candidate.LatestRecommendation
+                                    </td>
+                                }
+
+                            </tr>
+
+
+                            <!-- CURRENT STAGE -->
+                            <tr>
+
+                                <th class="text-start">
+                                    Current Stage
+                                </th>
+
+                                @foreach (var candidate in Model.Rows)
+                                {
+                                    <td>
+                                        @candidate.CurrentStage
+                                    </td>
+                                }
+
+                            </tr>
+
+
+                            <!-- STATUS -->
+                            <tr>
+
+                                <th class="text-start">
+                                    Recruitment Status
+                                </th>
+
+                                @foreach (var candidate in Model.Rows)
+                                {
+                                    <td>
+
+                                        <span class="badge text-bg-secondary">
+                                            @candidate.Status
+                                        </span>
+
+                                    </td>
+                                }
+
+                            </tr>
+
+
+                            <!-- VIEW PROFILE -->
+                            <tr>
+
+                                <th class="text-start">
+                                    Candidate Details
+                                </th>
+
+                                @foreach (var candidate in Model.Rows)
+                                {
+                                    <td>
+
+                                        <a asp-controller="Application"
+                                           asp-action="Details"
+                                           asp-route-id="@candidate.ApplicationId"
+                                           class="btn btn-sm btn-light">
+
+                                            View candidate
+
+                                        </a>
+
+                                    </td>
+                                }
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        }
     }
+
 </div>
+
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const checkboxes =
+                    document.querySelectorAll(
+                        ".candidate-checkbox"
+                    );
+
+                const compareButton =
+                    document.getElementById(
+                        "compareSelectedButton"
+                    );
+
+                const message =
+                    document.getElementById(
+                        "candidateSelectionMessage"
+                    );
+
+
+                function updateCompareButton() {
+
+                    if (!compareButton)
+                        return;
+
+
+                    const selectedCount =
+                        document.querySelectorAll(
+                            ".candidate-checkbox:checked"
+                        ).length;
+
+
+                    if (selectedCount < 2) {
+
+                        compareButton.disabled = true;
+
+                        message.textContent =
+                            "Select at least two candidates.";
+
+                    }
+                    else {
+
+                        compareButton.disabled = false;
+
+                        message.textContent =
+                            selectedCount
+                            + " candidates selected.";
+
+                    }
+
+                }
+
+
+                checkboxes.forEach(
+                    checkbox => {
+
+                        checkbox.addEventListener(
+                            "change",
+                            updateCompareButton
+                        );
+
+                    }
+                );
+
+
+                updateCompareButton();
+
+            }
+        );
+
+    </script>
+
+}

@@ -274,6 +274,25 @@ a.content-card:hover, .feature-card:hover, .stat-card:hover { transform: transla
 .site-body .form-control::placeholder { color: #79756d; }
 .site-body .form-control:focus, .site-body .form-select:focus, .site-body input[type="file"]:focus { color: #fff; background-color: rgba(255,255,255,.075) !important; border-color: rgba(255,184,0,.62) !important; box-shadow: 0 0 0 .2rem rgba(255,184,0,.10); }
 .site-body .form-select { color-scheme: dark; }
+/* =========================================================
+   DROPDOWN OPTION VISIBILITY FIX
+========================================================= */
+
+.site-body select.form-select option,
+.site-body select.form-select optgroup {
+    background-color: #151515 !important;
+    color: #f7f4eb !important;
+}
+
+    .site-body select.form-select option:checked {
+        background-color: #ffb800 !important;
+        color: #090909 !important;
+    }
+
+    .site-body select.form-select option:disabled {
+        background-color: #151515 !important;
+        color: #77736b !important;
+    }
 .site-body .form-check-input { background-color: rgba(255,255,255,.07); border-color: rgba(255,255,255,.22); }
 .site-body .form-check-input:checked { background-color: var(--gold); border-color: var(--gold); }
 
@@ -349,6 +368,249 @@ a.content-card:hover, .feature-card:hover, .stat-card:hover { transform: transla
     .altrium-auth-card { padding: 30px 22px; }
     .app-ambient { background-size: 42px 42px; }
     .content-card, .hero-card { padding: 18px; }
+}
+/* =========================================================
+   HIREFLOW CHATBOT
+========================================================= */
+
+#hf-chatbot {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 99999;
+    font-family: inherit;
+}
+
+/* Floating button */
+
+#hf-chat-button {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: #ffb800;
+    color: #080808;
+    font-size: 1.35rem;
+    cursor: pointer;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 184, 0, .22);
+    transition: .2s ease;
+}
+
+    #hf-chat-button:hover {
+        transform: translateY(-3px) scale(1.04);
+        background: #ffc62e;
+    }
+
+
+/* Chat window */
+
+#hf-chat-window {
+    position: absolute;
+    right: 0;
+    bottom: 72px;
+    width: 360px;
+    height: 500px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    color: #f7f4eb;
+    background: linear-gradient( 145deg, rgba(255,255,255,.055), rgba(255,255,255,.018) ), rgba(10,10,10,.97);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px;
+    box-shadow: 0 28px 70px rgba(0,0,0,.60), inset 0 1px 0 rgba(255,255,255,.05);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+}
+
+    #hf-chat-window.show {
+        display: flex;
+    }
+
+
+/* Header */
+
+.hf-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    background: rgba(255,184,0,.06);
+    border-bottom: 1px solid rgba(255,255,255,.09);
+}
+
+    .hf-chat-header strong {
+        display: block;
+        color: #ffca3a;
+        font-size: .95rem;
+    }
+
+    .hf-chat-header small {
+        display: block;
+        margin-top: 2px;
+        color: #99958d;
+        font-size: .68rem;
+    }
+
+#hf-chat-close {
+    border: none;
+    background: transparent;
+    color: #aaa69e;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+    #hf-chat-close:hover {
+        color: #ffb800;
+    }
+
+
+/* Messages */
+
+#hf-chat-messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px;
+    overflow-y: auto;
+}
+
+.hf-chat-message {
+    max-width: 84%;
+    padding: 10px 13px;
+    border-radius: 13px;
+    font-size: .82rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+    .hf-chat-message.bot {
+        align-self: flex-start;
+        color: #eee9df;
+        background: rgba(255,255,255,.065);
+        border: 1px solid rgba(255,255,255,.08);
+        border-bottom-left-radius: 4px;
+    }
+
+    .hf-chat-message.user {
+        align-self: flex-end;
+        color: #090909;
+        background: #ffb800;
+        font-weight: 600;
+        border-bottom-right-radius: 4px;
+    }
+
+
+/* Quick question buttons */
+
+.hf-chat-suggestions {
+    display: flex;
+    gap: 6px;
+    padding: 8px 14px;
+    overflow-x: auto;
+    border-top: 1px solid rgba(255,255,255,.06);
+}
+
+    .hf-chat-suggestions button {
+        flex: 0 0 auto;
+        padding: 6px 10px;
+        border: 1px solid rgba(255,184,0,.28);
+        border-radius: 50px;
+        background: rgba(255,184,0,.055);
+        color: #d8d3c8;
+        font-size: .65rem;
+        cursor: pointer;
+    }
+
+        .hf-chat-suggestions button:hover {
+            background: #ffb800;
+            color: #090909;
+        }
+
+
+/* Input section */
+
+.hf-chat-input-area {
+    display: grid;
+    grid-template-columns: 1fr 44px;
+    gap: 8px;
+    padding: 13px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    background: rgba(0,0,0,.25);
+}
+
+#hf-chat-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    outline: none;
+    color: #f7f4eb;
+    background: rgba(255,255,255,.055);
+    font-size: .8rem;
+}
+
+    #hf-chat-input::placeholder {
+        color: #77736b;
+    }
+
+    #hf-chat-input:focus {
+        border-color: rgba(255,184,0,.60);
+        box-shadow: 0 0 0 3px rgba(255,184,0,.08);
+    }
+
+#hf-chat-send {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 10px;
+    background: #ffb800;
+    color: #090909;
+    cursor: pointer;
+}
+
+    #hf-chat-send:hover {
+        background: #ffc62e;
+    }
+
+
+/* Scrollbar */
+
+#hf-chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#hf-chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#hf-chat-messages::-webkit-scrollbar-thumb {
+    background: #4c4023;
+    border-radius: 10px;
+}
+
+
+/* Mobile */
+
+@media (max-width: 480px) {
+
+    #hf-chatbot {
+        right: 14px;
+        bottom: 14px;
+    }
+
+    #hf-chat-window {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: 84px;
+        width: auto;
+        height: 65vh;
+    }
 }
 /* =========================================================
    FIX LONG PROFILE / DETAIL ROWS

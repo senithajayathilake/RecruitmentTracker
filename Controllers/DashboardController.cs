@@ -22,18 +22,124 @@ public class DashboardController : Controller
     [Authorize(Roles = "HR")]
     public async Task<IActionResult> HR()
     {
+        var now = DateTime.Now;
+        var staleCutoff = DateTime.UtcNow.AddDays(-7);
+
+        // 1. Shortlisted candidates with no active interview scheduled
+        var awaitingInterviewApplications = await _db.Applications
+            .Where(a =>
+                a.Status == "Shortlisted" &&
+                !a.Interviews.Any(i => i.Status != "Cancelled"))
+            .Include(a => a.Candidate)
+            .Include(a => a.Vacancy)
+            .ToListAsync();
+
+        // 2. Interviews that should already be finished but have no feedback
+        var possibleOverdueFeedback = await _db.Interviews
+            .Where(i =>
+                i.Status == "Scheduled" &&
+                i.Feedback == null &&
+                i.ScheduledAt <= now)
+            .Include(i => i.Application)!.ThenInclude(a => a!.Candidate)
+            .Include(i => i.Application)!.ThenInclude(a => a!.Vacancy)
+            .ToListAsync();
+
+        var overdueFeedbackInterviews = possibleOverdueFeedback
+            .Where(i =>
+                i.ScheduledAt.AddMinutes(i.DurationMinutes) <= now)
+            .ToList();
+
+        // 3. Applications open for more than 7 days without a final decision
+        var longOpenApplications = await _db.Applications
+            .Where(a =>
+                a.AppliedDate <= staleCutoff &&
+                a.Status != "Hired" &&
+                a.Status != "Rejected" &&
+                a.Status != "On Hold")
+            .Include(a => a.Candidate)
+            .Include(a => a.Vacancy)
+            .ToListAsync();
+
+        // Build the detailed bottleneck list
+        var bottlenecks = new List<RecruitmentBottleneckViewModel>();
+
+        foreach (var application in awaitingInterviewApplications)
+        {
+            bottlenecks.Add(new RecruitmentBottleneckViewModel
+            {
+                Type = "Awaiting Interview",
+                CandidateName = application.Candidate?.FullName ?? "Unknown candidate",
+                VacancyTitle = application.Vacancy?.JobTitle ?? "Unknown vacancy",
+                Description = "Candidate is shortlisted but no interview has been scheduled.",
+                ApplicationId = application.ApplicationId
+            });
+        }
+
+        foreach (var interview in overdueFeedbackInterviews)
+        {
+            bottlenecks.Add(new RecruitmentBottleneckViewModel
+            {
+                Type = "Awaiting Feedback",
+                CandidateName = interview.Application?.Candidate?.FullName ?? "Unknown candidate",
+                VacancyTitle = interview.Application?.Vacancy?.JobTitle ?? "Unknown vacancy",
+                Description =
+                    $"Interview was scheduled for {interview.ScheduledAt:dd MMM yyyy HH:mm} but feedback has not been submitted.",
+                ApplicationId = interview.ApplicationId
+            });
+        }
+
+        foreach (var application in longOpenApplications)
+        {
+            bottlenecks.Add(new RecruitmentBottleneckViewModel
+            {
+                Type = "Long-Open Application",
+                CandidateName = application.Candidate?.FullName ?? "Unknown candidate",
+                VacancyTitle = application.Vacancy?.JobTitle ?? "Unknown vacancy",
+                Description =
+                    $"Application has remained active since {application.AppliedDate:dd MMM yyyy}.",
+                ApplicationId = application.ApplicationId
+            });
+        }
+
         var vm = new DashboardViewModel
         {
             VacancyCount = await _db.Vacancies.CountAsync(),
+
             CandidateCount = await _db.Candidates.CountAsync(),
+
             ApplicationCount = await _db.Applications.CountAsync(),
-            ShortlistedCount = await _db.Applications.CountAsync(a => a.Status == "Shortlisted"),
-            PendingCount = await _db.Applications.CountAsync(a => a.Status == "New" || a.Status == "Under Review"),
-            RejectedCount = await _db.Applications.CountAsync(a => a.Status == "Rejected"),
-            UpcomingInterviewCount = await _db.Interviews.CountAsync(i =>
-                i.Status == "Scheduled" && i.ScheduledAt >= DateTime.Now),
-            PendingFeedbackCount = await _db.Interviews.CountAsync(i =>
-                i.Status == "Scheduled" && i.ScheduledAt <= DateTime.Now),
+
+            ShortlistedCount = await _db.Applications
+                .CountAsync(a => a.Status == "Shortlisted"),
+
+            PendingCount = await _db.Applications
+                .CountAsync(a =>
+                    a.Status == "New" ||
+                    a.Status == "Under Review"),
+
+            RejectedCount = await _db.Applications
+                .CountAsync(a => a.Status == "Rejected"),
+
+            UpcomingInterviewCount = await _db.Interviews
+                .CountAsync(i =>
+                    i.Status == "Scheduled" &&
+                    i.ScheduledAt >= now),
+
+            PendingFeedbackCount =
+                overdueFeedbackInterviews.Count,
+
+            // Sprint 2 bottleneck metrics
+            AwaitingInterviewCount =
+                awaitingInterviewApplications.Count,
+
+            OverdueFeedbackCount =
+                overdueFeedbackInterviews.Count,
+
+            LongOpenApplicationCount =
+                longOpenApplications.Count,
+
+            Bottlenecks = bottlenecks,
+
             RecentApplications = await _db.Applications
                 .Include(a => a.Candidate)
                 .Include(a => a.Vacancy)
@@ -41,10 +147,15 @@ public class DashboardController : Controller
                 .OrderByDescending(a => a.AppliedDate)
                 .Take(8)
                 .ToListAsync(),
+
             UpcomingInterviews = await _db.Interviews
-                .Where(i => i.Status == "Scheduled" && i.ScheduledAt >= DateTime.Now)
-                .Include(i => i.Application)!.ThenInclude(a => a!.Candidate)
-                .Include(i => i.Application)!.ThenInclude(a => a!.Vacancy)
+                .Where(i =>
+                    i.Status == "Scheduled" &&
+                    i.ScheduledAt >= now)
+                .Include(i => i.Application)!
+                    .ThenInclude(a => a!.Candidate)
+                .Include(i => i.Application)!
+                    .ThenInclude(a => a!.Vacancy)
                 .Include(i => i.InterviewStage)
                 .Include(i => i.Interviewer)
                 .OrderBy(i => i.ScheduledAt)
