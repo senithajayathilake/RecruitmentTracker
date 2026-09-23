@@ -1,0 +1,19 @@
+{
+  "ApplicationId": 3,
+  "OfferReference": "HF-2026-0003",
+  "CandidateName": "cody graha",
+  "CandidateEmail": "cody@gmail.com",
+  "JobTitle": "ERP Software Developer",
+  "Department": "Software Development / Enterprise Systems",
+  "EmploymentType": "Full Time",
+  "Salary": 3000,
+  "Currency": "GBP",
+  "SalaryPeriod": "per month",
+  "StartDate": "2026-10-07T00:00:00",
+  "OfferExpiryDate": "2026-09-30T00:00:00",
+  "WorkLocation": "Nottingham, UK",
+  "Notes": "Please confirm your acceptance by 30 September 2026. Onboarding instructions will be provided before your start date.",
+  "IssuedDate": "2026-09-23T09:58:33.6741932Z",
+  "UpdatedDate": "2026-09-23T09:58:33.6742747Z",
+  "IssuedByName": "HR Officer"
+}

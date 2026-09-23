@@ -3,31 +3,25 @@
 @{
     ViewData["Title"] = "Candidate Details";
 
-    var initial =
-        string.IsNullOrWhiteSpace(Model.FullName)
-            ? "?"
-            : Model.FullName.Trim()
-                .Substring(0, 1)
-                .ToUpper();
+    var initial = string.IsNullOrWhiteSpace(Model.FullName)
+        ? "?"
+        : Model.FullName.Trim().Substring(0, 1).ToUpper();
 
-    var avatarUrl =
-        Url.Action(
-            "Avatar",
-            "Candidate",
-            new
-            {
-                id = Model.CandidateId
-            });
+    var avatarUrl = Url.Action(
+        "Avatar",
+        "Candidate",
+        new { id = Model.CandidateId });
+
+    var availableVacancies =
+        ViewBag.AvailableVacancies as List<Vacancy>
+        ?? new List<Vacancy>();
 }
 
 <div class="container py-4">
 
-
     <div class="candidate-details-heading">
 
-
         <div class="candidate-avatar candidate-avatar-lg">
-
             <span class="candidate-avatar-fallback">
                 @initial
             </span>
@@ -36,155 +30,155 @@
                  src="@avatarUrl"
                  alt="@Model.FullName"
                  onerror="this.style.display='none';" />
-
         </div>
 
-
         <div class="candidate-details-heading-copy">
+            <span class="eyebrow">HR · CANDIDATE</span>
 
-            <span class="eyebrow">
-                HR · CANDIDATE
-            </span>
-
-            <h1>
-                @Model.FullName
-            </h1>
+            <h1>@Model.FullName</h1>
 
             <p>
-
                 @Model.Email
 
                 @if (!string.IsNullOrWhiteSpace(Model.Phone))
                 {
-                    <span>
-                        · @Model.Phone
-                    </span>
+                    <span>· @Model.Phone</span>
                 }
-
             </p>
-
         </div>
 
-
         <span class="badge text-bg-secondary candidate-details-status">
-
             @Model.Status
-
         </span>
-
     </div>
-
 
     <div class="row g-4">
 
-
         <div class="col-lg-7">
 
-
             <div class="content-card">
-
-                <h5>
-                    Candidate information
-                </h5>
-
+                <h5>Candidate information</h5>
 
                 <div class="pipeline-row">
-
-                    <span>
-                        Qualification
-                    </span>
+                    <span>Qualification</span>
 
                     <strong>
-
                         @(string.IsNullOrWhiteSpace(Model.HighestQualification)
                                                 ? "Not provided"
                                                 : Model.HighestQualification)
-
                     </strong>
-
                 </div>
 
-
                 <div class="pipeline-row">
-
-                    <span>
-                        Experience
-                    </span>
-
-                    <strong>
-                        @Model.YearsOfExperience years
-                    </strong>
-
+                    <span>Experience</span>
+                    <strong>@Model.YearsOfExperience years</strong>
                 </div>
 
-
                 <div class="pipeline-row">
-
-                    <span>
-                        Skills
-                    </span>
+                    <span>Skills</span>
 
                     <strong>
-
                         @(string.IsNullOrWhiteSpace(Model.Skills)
                                                 ? "Not provided"
                                                 : Model.Skills)
-
                     </strong>
-
                 </div>
 
-
                 <div class="pipeline-row">
-
-                    <span>
-                        Address
-                    </span>
+                    <span>Address</span>
 
                     <strong>
-
                         @(string.IsNullOrWhiteSpace(Model.Address)
                                                 ? "Not provided"
                                                 : Model.Address)
-
                     </strong>
-
                 </div>
 
-
                 <div class="pipeline-row">
-
-                    <span>
-                        Date of birth
-                    </span>
+                    <span>Date of birth</span>
 
                     <strong>
-
                         @(Model.DateOfBirth.HasValue
                                                 ? Model.DateOfBirth.Value.ToString("dd MMM yyyy")
                                                 : "Not provided")
-
                     </strong>
-
                 </div>
-
             </div>
 
-
             <div class="content-card mt-4">
-
-                <h5>
-                    Applications
-                </h5>
-
+                <h5>Applications</h5>
 
                 @if (!Model.Applications.Any())
                 {
                     <p class="text-secondary mt-3">
-                        No applications yet.
+                        No applications yet. Select a position below to hire this candidate.
                     </p>
                 }
 
+                @if (!Model.Cvs.Any())
+                {
+                    <p class="text-secondary mt-3">
+                        Upload a CV before hiring this candidate for a position.
+                    </p>
+
+                    <a asp-controller="CV"
+                       asp-action="Upload"
+                       asp-route-candidateId="@Model.CandidateId"
+                       class="btn btn-sm btn-primary">
+                        Upload CV
+                    </a>
+                }
+                else if (availableVacancies.Any())
+                {
+                    <form asp-controller="Candidate"
+                          asp-action="HireForVacancy"
+                          method="post"
+                          class="mt-3">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="id"
+                               value="@Model.CandidateId" />
+
+                        <label for="vacancyId" class="form-label">
+                            Position to hire for
+                        </label>
+
+                        <div class="d-flex gap-2 flex-wrap">
+                            <select id="vacancyId"
+                                    name="vacancyId"
+                                    class="form-select w-auto"
+                                    required>
+
+                                <option value="">Select a position</option>
+
+                                @foreach (var vacancy in availableVacancies)
+                                {
+                                    <option value="@vacancy.VacancyId">
+                                        @vacancy.JobTitle (@vacancy.Department)
+                                    </option>
+                                }
+                            </select>
+
+                            <button type="submit" class="btn btn-success">
+                                Hire for this position
+                            </button>
+                        </div>
+                    </form>
+                }
+                else if (!Model.Applications.Any())
+                {
+                    <p class="text-secondary mt-3">
+                        Create a vacancy first, then return here to hire this candidate.
+                    </p>
+
+                    <a asp-controller="Vacancy"
+                       asp-action="Create"
+                       class="btn btn-sm btn-primary">
+                        Create vacancy
+                    </a>
+                }
 
                 @foreach (var app in Model.Applications
                                 .OrderByDescending(a => a.AppliedDate))
@@ -192,52 +186,53 @@
                     <div class="border rounded p-3 mt-2">
 
                         <div class="d-flex justify-content-between">
-
-                            <strong>
-                                @app.Vacancy?.JobTitle
-                            </strong>
+                            <strong>@app.Vacancy?.JobTitle</strong>
 
                             <span class="badge text-bg-secondary">
                                 @app.Status
                             </span>
-
                         </div>
 
-
                         <div class="small text-secondary mt-1">
-
                             AI match:
-
-                            @(app.AiScore?.ToString("0.0")
-                                                    ?? "Pending")%
-
-                    </div>
-
+                            @(app.AiScore?.ToString("0.0") ?? "Pending")%
+                        </div>
 
                         <a asp-controller="Application"
                            asp-action="Details"
                            asp-route-id="@app.ApplicationId"
                            class="btn btn-sm btn-light mt-2">
-
                             Review application
-
                         </a>
 
-                    </div>
-                                }
+                        @if (app.Status != "Hired")
+                        {
+                            <form asp-controller="Application"
+                                  asp-action="SetStatus"
+                                  asp-route-id="@app.ApplicationId"
+                                  method="post"
+                                  class="d-inline">
 
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="status"
+                                       value="Hired" />
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-success mt-2">
+                                    Hire for this position
+                                </button>
+                            </form>
+                        }
+                    </div>
+                }
             </div>
 
-
             <div class="content-card mt-4">
-
-                <h5>
-                    Update candidate status
-                </h5>
-
+                <h5>Update candidate status</h5>
 
                 <div class="d-flex gap-2 mt-3 flex-wrap">
-
                     @foreach (var status in new[]
                                         {
                                         "Added",
@@ -249,63 +244,46 @@
                                         "Rejected"
                                         })
                     {
-                        <form asp-action="SetStatus"
+                        <form asp-controller="Candidate"
+                              asp-action="SetStatus"
                               method="post">
 
                             @Html.AntiForgeryToken()
-
 
                             <input type="hidden"
                                    name="id"
                                    value="@Model.CandidateId" />
 
-
                             <input type="hidden"
                                    name="status"
                                    value="@status" />
 
-
-                            <button class="btn btn-sm @(status == Model.Status
-                                                                    ? "btn-primary"
-                                                                    : "btn-outline-secondary")">
-
+                            <button type="submit"
+                                    class="btn btn-sm @(status == Model.Status
+                                                                            ? "btn-primary"
+                                                                            : "btn-outline-secondary")">
                             @status
-
-                            </button>
-
-                        </form>
+                        </button>
+                    </form>
                                         }
-
                 </div>
-
             </div>
 
         </div>
 
-
         <div class="col-lg-5">
 
-
             <div class="content-card">
-
                 <div class="d-flex justify-content-between">
-
-                    <h5>
-                        CVs
-                    </h5>
-
+                    <h5>CVs</h5>
 
                     <a asp-controller="CV"
                        asp-action="Upload"
                        asp-route-candidateId="@Model.CandidateId"
                        class="btn btn-sm btn-primary">
-
                         Upload
-
                     </a>
-
                 </div>
-
 
                 @if (!Model.Cvs.Any())
                 {
@@ -314,66 +292,44 @@
                     </p>
                 }
 
-
                 @foreach (var cv in Model.Cvs)
                 {
                     <div class="cv-row mt-3">
-
                         <i class="bi bi-file-earmark-text fs-3"></i>
 
-
                         <div>
-
-                            <strong>
-                                @cv.FileName
-                            </strong>
-
+                            <strong>@cv.FileName</strong>
 
                             <div class="small text-secondary">
-
                                 @cv.UploadedDate
                                 .ToLocalTime()
                                 .ToString("dd MMM yyyy HH:mm")
-
                             </div>
-
                         </div>
-
 
                         <a href="@cv.FilePath"
                            target="_blank"
                            class="btn btn-sm btn-light ms-auto">
-
                             Open
-
                         </a>
-
                     </div>
-
 
                     @if (cv.AiScore.HasValue)
                     {
                         <div class="small mt-2">
-
                             <strong>
-
                                 AI match:
                                 @cv.AiScore.Value.ToString("0.0")%
-
                             </strong>
 
                             <br />
 
                             @cv.AiSummary
-
                         </div>
                     }
                 }
-
             </div>
 
         </div>
-
     </div>
-
 </div>

@@ -1,0 +1,531 @@
+﻿/* =========================================================
+   HIGHER FLOW - OFFER LETTER SYSTEM
+========================================================= */
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.offer-empty-state {
+    padding: 55px 25px;
+    text-align: center;
+}
+
+    .offer-empty-state > i {
+        display: block;
+        margin-bottom: 18px;
+        color: #ffb800;
+        font-size: 3rem;
+    }
+
+    .offer-empty-state h4 {
+        margin-bottom: 8px;
+        color: #f7f4eb;
+    }
+
+    .offer-empty-state p {
+        max-width: 520px;
+        margin-left: auto;
+        margin-right: auto;
+        color: #a7a39a;
+    }
+
+
+/* =========================================================
+   HR CREATE / EDIT OFFER
+========================================================= */
+
+.offer-candidate-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+    .offer-candidate-summary > div {
+        padding: 18px;
+        border: 1px solid rgba(255,255,255,.10);
+        border-radius: 13px;
+        background: linear-gradient( 145deg, rgba(255,255,255,.05), rgba(255,255,255,.02) );
+    }
+
+    .offer-candidate-summary small {
+        display: block;
+        margin-bottom: 7px;
+        color: #ffb800;
+        font-size: .64rem;
+        font-weight: 800;
+        letter-spacing: .13em;
+    }
+
+    .offer-candidate-summary strong {
+        display: block;
+        color: #f7f4eb;
+        font-size: 1rem;
+    }
+
+    .offer-candidate-summary span {
+        display: block;
+        margin-top: 5px;
+        color: #99958d;
+        font-size: .78rem;
+    }
+
+
+/* =========================================================
+   OFFER HELP STEPS
+========================================================= */
+
+.offer-help-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+    .offer-help-step:last-child {
+        border-bottom: 0;
+    }
+
+    .offer-help-step > span {
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: linear-gradient( 135deg, #ffd34d, #ffb800 );
+        color: #090909;
+        font-size: .75rem;
+        font-weight: 900;
+        box-shadow: 0 8px 20px rgba(255,184,0,.15);
+    }
+
+    .offer-help-step p {
+        margin: 3px 0 0;
+        color: #b4afa5;
+        font-size: .82rem;
+        line-height: 1.55;
+    }
+
+
+/* =========================================================
+   CANDIDATE OFFER CARDS
+========================================================= */
+
+.offer-list-card {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+    .offer-list-card::before {
+        content: "";
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        top: -80px;
+        right: -70px;
+        border-radius: 50%;
+        background: rgba(255,184,0,.06);
+        pointer-events: none;
+    }
+
+.offer-list-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    color: #090909;
+    background: linear-gradient( 135deg, #ffd34d, #ffb800 );
+    font-size: 1.4rem;
+    box-shadow: 0 12px 30px rgba(255,184,0,.15);
+}
+
+.offer-list-card h3 {
+    margin-top: 8px;
+    color: #f7f4eb;
+}
+
+
+/* =========================================================
+   OFFER PAGE
+========================================================= */
+
+.offer-page-shell {
+    max-width: 1050px;
+}
+
+
+/* =========================================================
+   TOP ACTIONS
+========================================================= */
+
+.offer-print-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+    .offer-print-actions h1 {
+        margin: 4px 0 0;
+        color: #f7f4eb;
+    }
+
+
+/* =========================================================
+   PROFESSIONAL OFFER PAPER
+========================================================= */
+
+.offer-letter-paper {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 62px 70px;
+    color: #171717;
+    background: #ffffff;
+    border: 1px solid #e4e4e4;
+    border-radius: 8px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.48);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.7;
+}
+
+
+/* Keep letter text light-theme even on dark site */
+
+.site-body .offer-letter-paper,
+.site-body .offer-letter-paper p,
+.site-body .offer-letter-paper span,
+.site-body .offer-letter-paper strong,
+.site-body .offer-letter-paper small,
+.site-body .offer-letter-paper h1,
+.site-body .offer-letter-paper h2,
+.site-body .offer-letter-paper h3,
+.site-body .offer-letter-paper h4 {
+    text-shadow: none;
+}
+
+
+/* =========================================================
+   LETTER HEADER
+========================================================= */
+
+.offer-letter-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid #ffb800;
+}
+
+.offer-letter-logo {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: linear-gradient( 135deg, #ffd34d, #ffb800 );
+    color: #090909;
+    font-family: Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 900;
+}
+
+.offer-letter-header strong {
+    display: block;
+    color: #111 !important;
+    font-size: .95rem;
+    letter-spacing: .13em;
+}
+
+.offer-letter-header span {
+    display: block;
+    margin-top: 3px;
+    color: #777 !important;
+    font-size: .72rem;
+}
+
+
+/* =========================================================
+   DATE / REFERENCE
+========================================================= */
+
+.offer-letter-reference {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 26px 0;
+    color: #666;
+    font-size: .78rem;
+}
+
+    .offer-letter-reference span {
+        color: #666 !important;
+    }
+
+
+/* =========================================================
+   CANDIDATE ADDRESS
+========================================================= */
+
+.offer-letter-address {
+    display: flex;
+    flex-direction: column;
+    margin: 30px 0;
+}
+
+    .offer-letter-address strong {
+        color: #111 !important;
+        font-size: 1rem;
+    }
+
+    .offer-letter-address span {
+        color: #666 !important;
+        font-size: .85rem;
+    }
+
+
+/* =========================================================
+   LETTER TEXT
+========================================================= */
+
+.offer-letter-paper h2 {
+    margin: 30px 0 24px;
+    color: #111 !important;
+    font-size: 1.55rem;
+    font-weight: 750;
+    letter-spacing: -.02em;
+}
+
+.offer-letter-paper p {
+    color: #303030 !important;
+    font-size: .96rem;
+    line-height: 1.75;
+}
+
+    .offer-letter-paper p strong {
+        color: #111 !important;
+    }
+
+
+/* =========================================================
+   EMPLOYMENT DETAILS
+========================================================= */
+
+.offer-letter-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin: 30px 0;
+    overflow: hidden;
+    border: 1px solid #dedede;
+    border-radius: 9px;
+    background: #dedede;
+}
+
+    .offer-letter-details > div {
+        padding: 16px 18px;
+        background: #fafafa;
+    }
+
+    .offer-letter-details span {
+        display: block;
+        margin-bottom: 5px;
+        color: #777 !important;
+        font-size: .68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+    }
+
+    .offer-letter-details strong {
+        display: block;
+        color: #171717 !important;
+        font-size: .9rem;
+    }
+
+
+/* =========================================================
+   ADDITIONAL NOTES
+========================================================= */
+
+.offer-letter-notes {
+    margin: 30px 0;
+    padding: 20px;
+    border-left: 4px solid #ffb800;
+    border-radius: 0 6px 6px 0;
+    background: #faf7ef;
+}
+
+    .offer-letter-notes h4 {
+        margin-bottom: 8px;
+        color: #171717 !important;
+        font-size: .95rem;
+    }
+
+    .offer-letter-notes p {
+        margin: 0;
+        color: #363636 !important;
+        white-space: pre-line;
+    }
+
+
+/* =========================================================
+   OFFER VALIDITY
+========================================================= */
+
+.offer-validity {
+    margin: 28px 0;
+    padding: 15px 18px;
+    border: 1px solid #efd47b;
+    border-radius: 7px;
+    background: #fff9e8;
+    color: #53451a !important;
+    font-size: .9rem;
+}
+
+    .offer-validity strong {
+        color: #332900 !important;
+    }
+
+
+/* =========================================================
+   SIGNATURE
+========================================================= */
+
+.offer-signature {
+    display: flex;
+    flex-direction: column;
+    margin-top: 44px;
+}
+
+    .offer-signature span {
+        color: #555 !important;
+    }
+
+    .offer-signature strong {
+        margin-top: 18px;
+        color: #111 !important;
+    }
+
+    .offer-signature small {
+        color: #777 !important;
+    }
+
+
+/* =========================================================
+   LETTER FOOTER
+========================================================= */
+
+.offer-letter-footer {
+    margin-top: 60px;
+    padding-top: 18px;
+    border-top: 1px solid #ddd;
+    color: #999 !important;
+    font-size: .7rem;
+    text-align: center;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .offer-candidate-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .offer-letter-details {
+        grid-template-columns: 1fr;
+    }
+
+    .offer-print-actions {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+        .offer-print-actions > div:last-child {
+            width: 100%;
+        }
+
+        .offer-print-actions .btn {
+            width: 100%;
+        }
+
+    .offer-letter-paper {
+        padding: 38px 25px;
+    }
+
+    .offer-letter-reference {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+
+/* =========================================================
+   PRINT / SAVE PDF
+========================================================= */
+
+@media print {
+
+    @page {
+        size: A4;
+        margin: 14mm;
+    }
+
+    html,
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+    }
+
+        body * {
+            visibility: hidden !important;
+        }
+
+    .offer-letter-paper,
+    .offer-letter-paper * {
+        visibility: visible !important;
+    }
+
+    .offer-letter-paper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .offer-print-actions,
+    .app-navbar,
+    .hf-footer,
+    #hf-chatbot,
+    .app-ambient {
+        display: none !important;
+    }
+
+    .offer-letter-details,
+    .offer-letter-notes,
+    .offer-validity,
+    .offer-signature {
+        break-inside: avoid;
+    }
+}

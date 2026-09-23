@@ -1,0 +1,300 @@
+﻿@model OfferLetter
+
+@{
+    ViewData["Title"] = "Offer Letter";
+
+    var candidateView =
+        User.IsInRole("Candidate");
+}
+
+<div class="container py-4 offer-page-shell">
+
+
+    <div class="offer-print-actions">
+
+        <div>
+
+            <span class="eyebrow">
+                OFFER LETTER
+            </span>
+
+            <h1>
+                @Model.JobTitle
+            </h1>
+
+        </div>
+
+
+        <div class="d-flex gap-2">
+
+            <button type="button"
+                    class="btn btn-primary"
+                    onclick="window.print()">
+
+                <i class="bi bi-printer me-1"></i>
+
+                Print / Save PDF
+
+            </button>
+
+
+            @if (candidateView)
+            {
+                <a asp-controller="OfferLetter"
+                   asp-action="MyOffers"
+                   class="btn btn-light">
+
+                    Back
+
+                </a>
+            }
+            else
+            {
+                <a asp-controller="OfferLetter"
+                   asp-action="Index"
+                   class="btn btn-light">
+
+                    Back
+
+                </a>
+            }
+
+        </div>
+
+    </div>
+
+
+    <article class="offer-letter-paper">
+
+
+        <header class="offer-letter-header">
+
+            <div class="offer-letter-logo">
+                H
+            </div>
+
+
+            <div>
+
+                <strong>
+                    HIGHER FLOW
+                </strong>
+
+                <span>
+                    Recruitment
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <div class="offer-letter-reference">
+
+            <span>
+
+                @Model.IssuedDate
+                .ToLocalTime()
+                .ToString("dd MMMM yyyy")
+
+            </span>
+
+
+            <span>
+                Reference: @Model.OfferReference
+            </span>
+
+        </div>
+
+
+        <div class="offer-letter-address">
+
+            <strong>
+                @Model.CandidateName
+            </strong>
+
+            <span>
+                @Model.CandidateEmail
+            </span>
+
+        </div>
+
+
+        <h2>
+            Offer of Employment — @Model.JobTitle
+        </h2>
+
+
+        <p>
+            Dear @Model.CandidateName,
+        </p>
+
+
+        <p>
+            We are pleased to offer you the position of
+            <strong>@Model.JobTitle</strong>
+            with Higher Flow.
+        </p>
+
+
+        <p>
+            Following the recruitment and interview process,
+            we are delighted to invite you to join our team
+            under the following proposed employment details.
+        </p>
+
+
+        <div class="offer-letter-details">
+
+
+            <div>
+
+                <span>
+                    Position
+                </span>
+
+                <strong>
+                    @Model.JobTitle
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Department
+                </span>
+
+                <strong>
+                    @Model.Department
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Employment type
+                </span>
+
+                <strong>
+                    @Model.EmploymentType
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Work location
+                </span>
+
+                <strong>
+                    @Model.WorkLocation
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Salary
+                </span>
+
+                <strong>
+
+                    @Model.Currency
+                    @Model.Salary.ToString("N2")
+                    @Model.SalaryPeriod
+
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Proposed start date
+                </span>
+
+                <strong>
+
+                    @Model.StartDate
+                    .ToString("dd MMMM yyyy")
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        @if (!string.IsNullOrWhiteSpace(Model.Notes))
+        {
+            <div class="offer-letter-notes">
+
+                <h4>
+                    Additional information
+                </h4>
+
+                <p>
+                    @Model.Notes
+                </p>
+
+            </div>
+        }
+
+
+        <div class="offer-validity">
+
+            This offer is valid until
+
+            <strong>
+
+                @Model.OfferExpiryDate
+                .ToString("dd MMMM yyyy")
+
+            </strong>.
+
+        </div>
+
+
+        <p>
+            We are excited about the possibility of you joining
+            Higher Flow and contributing to the team.
+        </p>
+
+
+        <div class="offer-signature">
+
+            <span>
+                Kind regards,
+            </span>
+
+            <strong>
+                @Model.IssuedByName
+            </strong>
+
+            <small>
+                Higher Flow Recruitment
+            </small>
+
+        </div>
+
+
+        <footer class="offer-letter-footer">
+
+            Higher Flow Recruitment
+            ·
+            Offer reference @Model.OfferReference
+
+        </footer>
+
+    </article>
+
+</div>

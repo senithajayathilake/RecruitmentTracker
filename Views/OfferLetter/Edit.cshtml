@@ -1,0 +1,330 @@
+﻿@model OfferLetter
+
+@{
+    var editing =
+        Model.IssuedDate != default;
+
+    ViewData["Title"] =
+        editing
+            ? "Edit Offer Letter"
+            : "Create Offer Letter";
+}
+
+<div class="container py-4">
+
+    <div class="page-heading">
+
+        <div>
+
+            <span class="eyebrow">
+                HR · OFFER LETTER
+            </span>
+
+            <h1>
+                @(editing
+                                ? "Update offer letter"
+                                : "Create offer letter")
+            </h1>
+
+            <p>
+                @Model.CandidateName · @Model.JobTitle
+            </p>
+
+        </div>
+
+
+        <a asp-controller="OfferLetter"
+           asp-action="Index"
+           class="btn btn-light">
+
+            <i class="bi bi-arrow-left me-1"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <div class="content-card">
+
+                <form asp-controller="OfferLetter"
+                      asp-action="Edit"
+                      asp-route-id="@Model.ApplicationId"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="alert alert-danger">
+                    </div>
+
+
+                    <div class="offer-candidate-summary">
+
+                        <div>
+
+                            <small>
+                                CANDIDATE
+                            </small>
+
+                            <strong>
+                                @Model.CandidateName
+                            </strong>
+
+                            <span>
+                                @Model.CandidateEmail
+                            </span>
+
+                        </div>
+
+
+                        <div>
+
+                            <small>
+                                POSITION
+                            </small>
+
+                            <strong>
+                                @Model.JobTitle
+                            </strong>
+
+                            <span>
+                                @Model.Department · @Model.EmploymentType
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr class="my-4" />
+
+
+                    <div class="row g-3">
+
+
+                        <div class="col-md-6">
+
+                            <label asp-for="Salary"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Salary"
+                                   type="number"
+                                   step="0.01"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Salary"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-3">
+
+                            <label asp-for="Currency"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="Currency"
+                                    class="form-select">
+
+                                <option value="LKR">LKR</option>
+                                <option value="USD">USD</option>
+                                <option value="GBP">GBP</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-3">
+
+                            <label asp-for="SalaryPeriod"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="SalaryPeriod"
+                                    class="form-select">
+
+                                <option value="per month">
+                                    Per month
+                                </option>
+
+                                <option value="per year">
+                                    Per year
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label asp-for="StartDate"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="StartDate"
+                                   type="date"
+                                   class="form-control" />
+
+                            <span asp-validation-for="StartDate"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label asp-for="OfferExpiryDate"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="OfferExpiryDate"
+                                   type="date"
+                                   class="form-control" />
+
+                            <span asp-validation-for="OfferExpiryDate"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-12">
+
+                            <label asp-for="WorkLocation"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="WorkLocation"
+                                   class="form-control"
+                                   placeholder="Colombo / Hybrid / Remote" />
+
+                            <span asp-validation-for="WorkLocation"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-12">
+
+                            <label asp-for="Notes"
+                                   class="form-label">
+                            </label>
+
+                            <textarea asp-for="Notes"
+                                      class="form-control"
+                                      rows="5"
+                                      placeholder="Optional benefits, probation details or other information."></textarea>
+
+                            <span asp-validation-for="Notes"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="d-flex gap-2 mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="bi bi-send-check me-1"></i>
+
+                            @(editing
+                                                        ? "Update offer"
+                                                        : "Issue offer")
+
+                        </button>
+
+
+                        <a asp-controller="OfferLetter"
+                           asp-action="Index"
+                           class="btn btn-light">
+
+                            Cancel
+
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-4">
+
+            <div class="content-card">
+
+                <h5>
+                    What happens next?
+                </h5>
+
+
+                <div class="offer-help-step">
+
+                    <span>1</span>
+
+                    <p>
+                        Complete the salary, start date and offer details.
+                    </p>
+
+                </div>
+
+
+                <div class="offer-help-step">
+
+                    <span>2</span>
+
+                    <p>
+                        Issue the offer letter.
+                    </p>
+
+                </div>
+
+
+                <div class="offer-help-step">
+
+                    <span>3</span>
+
+                    <p>
+                        The candidate receives an in-app notification automatically.
+                    </p>
+
+                </div>
+
+
+                <div class="offer-help-step">
+
+                    <span>4</span>
+
+                    <p>
+                        The candidate can view, print or save the letter as PDF.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

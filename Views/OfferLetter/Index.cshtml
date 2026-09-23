@@ -1,0 +1,175 @@
+﻿@model IEnumerable<Application>
+
+@{
+    ViewData["Title"] = "Offer Letters";
+
+    var offerIds =
+        ViewBag.OfferIds as HashSet<int>
+        ?? new HashSet<int>();
+}
+
+<div class="container py-4">
+
+    <div class="page-heading">
+
+        <div>
+            <span class="eyebrow">
+                HR · OFFER LETTERS
+            </span>
+
+            <h1>
+                Offer letters
+            </h1>
+
+            <p>
+                Create and manage offers for candidates who have been hired.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="content-card">
+
+        @if (!Model.Any())
+        {
+            <div class="offer-empty-state">
+
+                <i class="bi bi-file-earmark-text"></i>
+
+                <h4>
+                    No hired candidates yet
+                </h4>
+
+                <p>
+                    Candidates will appear here after their application status is changed to Hired.
+                </p>
+
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Position</th>
+                            <th>Department</th>
+                            <th>Offer status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var application in Model)
+                        {
+                            var hasOffer =
+                            offerIds.Contains(
+                            application.ApplicationId);
+
+                            <tr>
+
+                                <td>
+
+                                    <strong>
+                                        @application.Candidate?.FullName
+                                    </strong>
+
+                                    <div class="small text-secondary">
+                                        @application.Candidate?.Email
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+                                    @application.Vacancy?.JobTitle
+                                </td>
+
+
+                                <td>
+                                    @application.Vacancy?.Department
+                                </td>
+
+
+                                <td>
+
+                                    @if (hasOffer)
+                                    {
+                                        <span class="badge text-bg-success">
+
+                                            <i class="bi bi-check-circle me-1"></i>
+
+                                            Issued
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-warning">
+
+                                            Not issued
+
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <td class="text-end">
+
+                                    @if (hasOffer)
+                                    {
+                                        <a asp-controller="OfferLetter"
+                                           asp-action="Details"
+                                           asp-route-id="@application.ApplicationId"
+                                           class="btn btn-sm btn-light">
+
+                                            View
+
+                                        </a>
+
+
+                                        <a asp-controller="OfferLetter"
+                                           asp-action="Edit"
+                                           asp-route-id="@application.ApplicationId"
+                                           class="btn btn-sm btn-primary ms-1">
+
+                                            Edit
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="OfferLetter"
+                                           asp-action="Edit"
+                                           asp-route-id="@application.ApplicationId"
+                                           class="btn btn-sm btn-primary">
+
+                                            <i class="bi bi-file-earmark-plus me-1"></i>
+
+                                            Create offer
+
+                                        </a>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>

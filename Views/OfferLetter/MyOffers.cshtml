@@ -1,0 +1,114 @@
+﻿@model IEnumerable<Application>
+
+@{
+    ViewData["Title"] = "My Offers";
+}
+
+<div class="container py-4">
+
+    <div class="page-heading">
+
+        <div>
+
+            <span class="eyebrow">
+                CANDIDATE · OFFERS
+            </span>
+
+            <h1>
+                My offer letters
+            </h1>
+
+            <p>
+                View offer letters issued by Higher Flow Recruitment.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    @if (!Model.Any())
+    {
+        <div class="content-card">
+
+            <div class="offer-empty-state">
+
+                <i class="bi bi-envelope-paper"></i>
+
+                <h4>
+                    No offer letters yet
+                </h4>
+
+                <p>
+                    Any offer issued to you will appear here.
+                </p>
+
+
+                <a asp-controller="Dashboard"
+                   asp-action="Candidate"
+                   class="btn btn-light">
+
+                    Back to dashboard
+
+                </a>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var application in Model)
+            {
+                <div class="col-lg-6">
+
+                    <div class="content-card offer-list-card">
+
+                        <div class="offer-list-icon">
+
+                            <i class="bi bi-envelope-paper"></i>
+
+                        </div>
+
+
+                        <span class="eyebrow">
+                            OFFER LETTER
+                        </span>
+
+
+                        <h3>
+                            @application.Vacancy?.JobTitle
+                        </h3>
+
+
+                        <p class="text-secondary">
+
+                            @application.Vacancy?.Department
+                            ·
+                            @application.Vacancy?.EmploymentType
+
+                        </p>
+
+
+                        <a asp-controller="OfferLetter"
+                           asp-action="Details"
+                           asp-route-id="@application.ApplicationId"
+                           class="btn btn-primary mt-3">
+
+                            <i class="bi bi-file-earmark-text me-1"></i>
+
+                            View offer letter
+
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
