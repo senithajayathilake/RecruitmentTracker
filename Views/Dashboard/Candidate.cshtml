@@ -1,135 +1,623 @@
 @model CandidateDashboardViewModel
+
 @{
     ViewData["Title"] = "Candidate Dashboard";
-    var appliedIds = ViewBag.AppliedVacancyIds as HashSet<int> ?? new HashSet<int>();
+
+    var appliedIds =
+        ViewBag.AppliedVacancyIds as HashSet<int>
+        ?? new HashSet<int>();
+
+    var initial =
+        string.IsNullOrWhiteSpace(Model.Candidate.FullName)
+            ? "?"
+            : Model.Candidate.FullName.Trim()
+                .Substring(0, 1)
+                .ToUpper();
+
+    var avatarUrl =
+        Url.Action(
+            "Avatar",
+            "Candidate",
+            new
+            {
+                id = Model.Candidate.CandidateId
+            });
 }
+
 <div class="container py-4">
-    <div class="page-heading">
-        <div><span class="eyebrow">CANDIDATE PORTAL</span><h1>Welcome, @Model.Candidate.FullName</h1><p>Your profile, CV, applications and interview updates in one place.</p></div>
-        <a asp-controller="CV" asp-action="Upload" class="btn btn-primary"><i class="bi bi-upload me-2"></i>Upload CV</a>
+
+
+    <div class="candidate-dashboard-header">
+
+        <div class="candidate-dashboard-person">
+
+            <div class="candidate-avatar candidate-avatar-lg">
+
+                <span class="candidate-avatar-fallback">
+                    @initial
+                </span>
+
+                <img class="candidate-avatar-image"
+                     src="@avatarUrl"
+                     alt="@Model.Candidate.FullName"
+                     onerror="this.style.display='none';" />
+
+            </div>
+
+
+            <div>
+
+                <span class="eyebrow">
+                    CANDIDATE PORTAL
+                </span>
+
+                <h1>
+                    Welcome, @Model.Candidate.FullName
+                </h1>
+
+                <p>
+                    Your profile, CV, applications and interview updates in one place.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <a asp-controller="CV"
+           asp-action="Upload"
+           class="btn btn-primary">
+
+            <i class="bi bi-upload me-2"></i>
+
+            Upload CV
+
+        </a>
+
     </div>
 
+
     <div class="row g-3 mb-4">
-        <div class="col-md-3"><div class="stat-card"><span>My CVs</span><strong>@Model.Cvs.Count</strong><i class="bi bi-file-earmark-text"></i></div></div>
-        <div class="col-md-3"><div class="stat-card"><span>Applications</span><strong>@Model.Applications.Count</strong><i class="bi bi-send"></i></div></div>
-        <div class="col-md-3"><div class="stat-card"><span>Upcoming interviews</span><strong>@Model.UpcomingInterviews.Count</strong><i class="bi bi-calendar-event"></i></div></div>
-        <div class="col-md-3"><div class="stat-card"><span>Open jobs</span><strong>@Model.OpenVacancies.Count</strong><i class="bi bi-briefcase"></i></div></div>
+
+
+        <div class="col-md-3">
+
+            <div class="stat-card">
+
+                <span>
+                    My CVs
+                </span>
+
+                <strong>
+                    @Model.Cvs.Count
+                </strong>
+
+                <i class="bi bi-file-earmark-text"></i>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="stat-card">
+
+                <span>
+                    Applications
+                </span>
+
+                <strong>
+                    @Model.Applications.Count
+                </strong>
+
+                <i class="bi bi-send"></i>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="stat-card">
+
+                <span>
+                    Upcoming interviews
+                </span>
+
+                <strong>
+                    @Model.UpcomingInterviews.Count
+                </strong>
+
+                <i class="bi bi-calendar-event"></i>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="stat-card">
+
+                <span>
+                    Open jobs
+                </span>
+
+                <strong>
+                    @Model.OpenVacancies.Count
+                </strong>
+
+                <i class="bi bi-briefcase"></i>
+
+            </div>
+
+        </div>
+
     </div>
+
 
     @if (Model.UpcomingInterviews.Any())
     {
         <div class="content-card mb-4">
-            <h5>Upcoming interviews</h5>
+
+            <h5>
+                Upcoming interviews
+            </h5>
+
+
             @foreach (var interview in Model.UpcomingInterviews)
             {
                 <div class="border rounded p-3 mt-3">
+
                     <div class="d-flex justify-content-between">
+
                         <div>
-                            <strong>@interview.Application?.Vacancy?.JobTitle</strong>
-                            <div class="small text-secondary">@interview.InterviewStage?.StageName</div>
+
+                            <strong>
+                                @interview.Application?.Vacancy?.JobTitle
+                            </strong>
+
+                            <div class="small text-secondary">
+                                @interview.InterviewStage?.StageName
+                            </div>
+
                         </div>
-                        <span class="badge text-bg-primary">@interview.ScheduledAt.ToString("dd MMM yyyy HH:mm")</span>
+
+
+                        <span class="badge text-bg-primary">
+
+                            @interview.ScheduledAt
+                            .ToString("dd MMM yyyy HH:mm")
+
+                        </span>
+
                     </div>
-                    <div class="small mt-2">Interviewer: @interview.Interviewer?.FullName</div>
-                    <div class="small">Location / link: @interview.LocationOrMeetingLink</div>
-                    <a asp-controller="Interview" asp-action="Details" asp-route-id="@interview.InterviewId" class="btn btn-sm btn-light mt-2">View details</a>
+
+
+                    <div class="small mt-2">
+
+                        Interviewer:
+                        @interview.Interviewer?.FullName
+
+                    </div>
+
+
+                    <div class="small">
+
+                        Location / link:
+                        @interview.LocationOrMeetingLink
+
+                    </div>
+
+
+                    <a asp-controller="Interview"
+                       asp-action="Details"
+                       asp-route-id="@interview.InterviewId"
+                       class="btn btn-sm btn-light mt-2">
+
+                        View details
+
+                    </a>
+
                 </div>
             }
+
         </div>
     }
 
+
     <div class="row g-4">
+
+
         <div class="col-lg-5">
+
+
             <div class="content-card">
+
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5>My CV</h5>
-                    <a asp-controller="CV" asp-action="Upload" class="btn btn-sm btn-outline-primary">Upload / Replace</a>
+
+                    <h5>
+                        My CV
+                    </h5>
+
+
+                    <a asp-controller="CV"
+                       asp-action="Upload"
+                       class="btn btn-sm btn-outline-primary">
+
+                        Upload / Replace
+
+                    </a>
+
                 </div>
+
+
                 @if (!Model.Cvs.Any())
                 {
-                    <div class="alert alert-warning mt-3 mb-0">Upload a CV before applying for a vacancy.</div>
+                    <div class="alert alert-warning mt-3 mb-0">
+
+                        Upload a CV before applying for a vacancy.
+
+                    </div>
                 }
                 else
                 {
                     var cv = Model.Cvs.First();
+
+
                     <div class="cv-row mt-3">
+
                         <i class="bi bi-file-earmark-pdf fs-3"></i>
-                        <div><strong>@cv.FileName</strong><div class="small text-secondary">@cv.UploadedDate.ToLocalTime().ToString("dd MMM yyyy HH:mm")</div></div>
-                        <a href="@cv.FilePath" target="_blank" class="btn btn-sm btn-light ms-auto">Open</a>
+
+
+                        <div>
+
+                            <strong>
+                                @cv.FileName
+                            </strong>
+
+
+                            <div class="small text-secondary">
+
+                                @cv.UploadedDate
+                                .ToLocalTime()
+                                .ToString("dd MMM yyyy HH:mm")
+
+                            </div>
+
+                        </div>
+
+
+                        <a href="@cv.FilePath"
+                           target="_blank"
+                           class="btn btn-sm btn-light ms-auto">
+
+                            Open
+
+                        </a>
+
                     </div>
                 }
+
             </div>
 
-            <div class="content-card mt-4">
-                <div class="d-flex justify-content-between"><h5>My profile</h5><a asp-controller="Candidate" asp-action="Profile" class="btn btn-sm btn-light">Edit</a></div>
-                <div class="pipeline-row"><span>Email</span><strong>@Model.Candidate.Email</strong></div>
-                <div class="pipeline-row"><span>Qualification</span><strong>@Model.Candidate.HighestQualification</strong></div>
-                <div class="pipeline-row"><span>Experience</span><strong>@Model.Candidate.YearsOfExperience years</strong></div>
-                <div class="pipeline-row"><span>Skills</span><strong>@Model.Candidate.Skills</strong></div>
-            </div>
 
             <div class="content-card mt-4">
-                <h5>Notifications</h5>
+
+
+                <div class="candidate-profile-summary">
+
+
+                    <div class="candidate-avatar candidate-avatar-md">
+
+                        <span class="candidate-avatar-fallback">
+                            @initial
+                        </span>
+
+                        <img class="candidate-avatar-image"
+                             src="@avatarUrl"
+                             alt="@Model.Candidate.FullName"
+                             onerror="this.style.display='none';" />
+
+                    </div>
+
+
+                    <div>
+
+                        <h5 class="mb-1">
+                            My profile
+                        </h5>
+
+                        <small>
+                            @Model.Candidate.FullName
+                        </small>
+
+                    </div>
+
+
+                    <a asp-controller="Candidate"
+                       asp-action="Profile"
+                       class="btn btn-sm btn-light ms-auto">
+
+                        Edit
+
+                    </a>
+
+                </div>
+
+
+                <div class="pipeline-row">
+
+                    <span>
+                        Email
+                    </span>
+
+                    <strong>
+                        @Model.Candidate.Email
+                    </strong>
+
+                </div>
+
+
+                <div class="pipeline-row">
+
+                    <span>
+                        Qualification
+                    </span>
+
+                    <strong>
+                        @Model.Candidate.HighestQualification
+                    </strong>
+
+                </div>
+
+
+                <div class="pipeline-row">
+
+                    <span>
+                        Experience
+                    </span>
+
+                    <strong>
+                        @Model.Candidate.YearsOfExperience years
+                    </strong>
+
+                </div>
+
+
+                <div class="pipeline-row">
+
+                    <span>
+                        Skills
+                    </span>
+
+                    <strong>
+                        @Model.Candidate.Skills
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="content-card mt-4">
+
+                <h5>
+                    Notifications
+                </h5>
+
+
                 @if (!Model.Notifications.Any())
                 {
-                    <p class="text-secondary mt-3 mb-0">No notifications yet.</p>
+                    <p class="text-secondary mt-3 mb-0">
+                        No notifications yet.
+                    </p>
                 }
+
+
                 @foreach (var n in Model.Notifications)
                 {
-                    <form asp-controller="Notification" asp-action="Read" method="post" class="notification-row">
+                    <form asp-controller="Notification"
+                          asp-action="Read"
+                          method="post"
+                          class="notification-row">
+
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@n.NotificationId" />
+
+
+                        <input type="hidden"
+                               name="id"
+                               value="@n.NotificationId" />
+
+
                         <button class="btn btn-link text-start text-decoration-none p-0 w-100">
-                            <strong class="@(n.IsRead ? "text-secondary" : "")">@n.Title</strong>
-                            <div class="small text-secondary">@n.Message</div>
+
+                            <strong class="@(n.IsRead
+                                                                    ? "text-secondary"
+                                                                    : "")">
+
+                            @n.Title
+
+                            </strong>
+
+
+                            <div class="small text-secondary">
+                                @n.Message
+                            </div>
+
                         </button>
+
                     </form>
-                }
+                                }
+
             </div>
+
         </div>
 
+
         <div class="col-lg-7">
+
+
             <div class="content-card">
-                <div class="d-flex justify-content-between align-items-center mb-3"><h5>My applications</h5><a asp-controller="Vacancy" asp-action="Browse" class="btn btn-sm btn-outline-primary">Browse jobs</a></div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <h5>
+                        My applications
+                    </h5>
+
+
+                    <a asp-controller="Vacancy"
+                       asp-action="Browse"
+                       class="btn btn-sm btn-outline-primary">
+
+                        Browse jobs
+
+                    </a>
+
+                </div>
+
+
                 @if (!Model.Applications.Any())
                 {
-                    <p class="text-secondary">You have not applied for any vacancies yet.</p>
+                    <p class="text-secondary">
+
+                        You have not applied for any vacancies yet.
+
+                    </p>
                 }
                 else
                 {
                     foreach (var app in Model.Applications)
                     {
                         <div class="border rounded p-3 mb-2">
-                            <div class="d-flex justify-content-between"><strong>@app.Vacancy?.JobTitle</strong><span class="badge text-bg-secondary">@app.Status</span></div>
-                            <div class="small text-secondary mt-1">Applied @app.AppliedDate.ToLocalTime().ToString("dd MMM yyyy") · AI match @(app.AiScore?.ToString("0.0") ?? "Pending")%</div>
+
+                            <div class="d-flex justify-content-between">
+
+                                <strong>
+                                    @app.Vacancy?.JobTitle
+                                </strong>
+
+                                <span class="badge text-bg-secondary">
+                                    @app.Status
+                                </span>
+
+                            </div>
+
+
+                            <div class="small text-secondary mt-1">
+
+                                Applied
+
+                                @app.AppliedDate
+                                .ToLocalTime()
+                                .ToString("dd MMM yyyy")
+
+                                · AI match
+
+                                @(app.AiScore?.ToString("0.0")
+                                                        ?? "Pending")%
+
+                    </div>
+
                         </div>
-                    }
+                                }
                 }
+
             </div>
 
+
             <div class="content-card mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-3"><h5>Available vacancies</h5><a asp-controller="Vacancy" asp-action="Browse" class="btn btn-sm btn-light">View all</a></div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <h5>
+                        Available vacancies
+                    </h5>
+
+
+                    <a asp-controller="Vacancy"
+                       asp-action="Browse"
+                       class="btn btn-sm btn-light">
+
+                        View all
+
+                    </a>
+
+                </div>
+
+
                 @foreach (var vacancy in Model.OpenVacancies.Take(5))
                 {
                     <div class="border rounded p-3 mb-2">
+
                         <div class="d-flex justify-content-between">
-                            <div><strong>@vacancy.JobTitle</strong><div class="small text-secondary">@vacancy.Department · @vacancy.Location · @vacancy.EmploymentType</div></div>
+
+                            <div>
+
+                                <strong>
+                                    @vacancy.JobTitle
+                                </strong>
+
+
+                                <div class="small text-secondary">
+
+                                    @vacancy.Department
+                                    ·
+                                    @vacancy.Location
+                                    ·
+                                    @vacancy.EmploymentType
+
+                                </div>
+
+                            </div>
+
+
                             @if (appliedIds.Contains(vacancy.VacancyId))
                             {
-                                <span class="badge text-bg-success align-self-start">Applied</span>
+                                <span class="badge text-bg-success align-self-start">
+
+                                    Applied
+
+                                </span>
                             }
                             else
                             {
-                                <form asp-controller="Application" asp-action="Apply" method="post">
+                                <form asp-controller="Application"
+                                      asp-action="Apply"
+                                      method="post">
+
                                     @Html.AntiForgeryToken()
-                                    <input type="hidden" name="vacancyId" value="@vacancy.VacancyId" />
-                                    <button class="btn btn-sm btn-primary" @(Model.Cvs.Any() ? "" : "disabled")>Apply</button>
+
+
+                                    <input type="hidden"
+                                           name="vacancyId"
+                                           value="@vacancy.VacancyId" />
+
+
+                                    <button class="btn btn-sm btn-primary"
+                                            @(Model.Cvs.Any()
+                                                                                ? ""
+                                                                                : "disabled")>
+
+                                Apply
+
+                                    </button>
+
                                 </form>
-                            }
+                                                }
+
                         </div>
+
                     </div>
                 }
+
             </div>
+
         </div>
+
     </div>
+
 </div>

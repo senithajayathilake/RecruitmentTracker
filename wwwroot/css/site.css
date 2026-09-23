@@ -350,3 +350,260 @@ a.content-card:hover, .feature-card:hover, .stat-card:hover { transform: transla
     .app-ambient { background-size: 42px 42px; }
     .content-card, .hero-card { padding: 18px; }
 }
+/* =========================================================
+   FIX LONG PROFILE / DETAIL ROWS
+========================================================= */
+
+.pipeline-row {
+    display: grid !important;
+    grid-template-columns: 130px minmax(0, 1fr);
+    align-items: start;
+    gap: 18px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,.085);
+}
+
+    .pipeline-row:last-child {
+        border-bottom: 0;
+    }
+
+
+    /* LEFT LABEL */
+
+    .pipeline-row > span {
+        color: #d5d0c6;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+
+
+    /* RIGHT VALUE */
+
+    .pipeline-row > strong {
+        min-width: 0;
+        color: #f6f2e9;
+        font-weight: 700;
+        line-height: 1.55;
+        text-align: right;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+/* MOBILE */
+
+@media (max-width: 576px) {
+
+    .pipeline-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+        .pipeline-row > strong {
+            text-align: left;
+        }
+}
+/* =========================================================
+   FIX DARK VACANCY DROPDOWNS
+========================================================= */
+
+.site-body select,
+.site-body .form-select {
+    color: #f7f4eb !important;
+    background-color: #171717 !important;
+    border: 1px solid rgba(255, 184, 0, .45) !important;
+    border-radius: 10px !important;
+    min-height: 46px;
+    padding: 10px 42px 10px 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 0 0 1px rgba(255,184,0,.03);
+    color-scheme: dark;
+}
+
+
+    /* Focus state */
+
+    .site-body select:focus,
+    .site-body .form-select:focus {
+        color: #fff !important;
+        background-color: #1c1c1c !important;
+        border-color: #ffb800 !important;
+        outline: none !important;
+        box-shadow: 0 0 0 .2rem rgba(255,184,0,.10), 0 10px 30px rgba(0,0,0,.25) !important;
+    }
+
+
+    /* Dropdown choices */
+
+    .site-body select option,
+    .site-body .form-select option {
+        color: #f5f1e7 !important;
+        background: #171717 !important;
+        padding: 12px;
+    }
+
+
+        /* Selected option */
+
+        .site-body select option:checked,
+        .site-body .form-select option:checked {
+            color: #090909 !important;
+            background: #ffb800 !important;
+        }
+
+
+        /* Hover where supported */
+
+        .site-body select option:hover,
+        .site-body .form-select option:hover {
+            color: #090909 !important;
+            background: #ffb800 !important;
+        }
+
+
+        /* Disabled placeholder/options */
+
+        .site-body select option:disabled,
+        .site-body .form-select option:disabled {
+            color: #777 !important;
+            background: #171717 !important;
+        }
+
+
+/* Make select arrow work better with dark UI */
+
+.site-body .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23ffb800' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+}
+/* =========================================================
+   FINAL CANDIDATE AVATAR ROUND FIX
+========================================================= */
+
+/* Base avatar circle */
+.site-body .candidate-avatar {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    aspect-ratio: 1 / 1 !important;
+    overflow: hidden !important;
+    border-radius: 50% !important;
+    background: linear-gradient( 145deg, #ffdc70, #ffb800 ) !important;
+    border: 2px solid rgba(255, 184, 0, .55) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,.38), 0 0 0 4px rgba(255,184,0,.06) !important;
+}
+
+
+    /* Uploaded candidate picture */
+    .site-body .candidate-avatar .candidate-avatar-image,
+    .site-body .candidate-avatar img {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-width: 100% !important;
+        min-height: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
+        object-fit: cover !important;
+        /* Focus more on the candidate's face */
+        object-position: center 25% !important;
+        border-radius: 50% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+
+/* Initial shown when no photo exists */
+.site-body .candidate-avatar-fallback {
+    position: relative !important;
+    z-index: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100%;
+    height: 100%;
+    font-weight: 800;
+    color: #090909;
+}
+
+
+/* Small avatar - HR candidate table */
+.site-body .candidate-avatar-sm {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    min-height: 46px !important;
+    border-radius: 50% !important;
+}
+
+
+/* Medium avatar - profile card */
+.site-body .candidate-avatar-md {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    border-radius: 50% !important;
+}
+
+
+/* Large avatar - dashboard/details */
+.site-body .candidate-avatar-lg {
+    width: 92px !important;
+    height: 92px !important;
+    min-width: 92px !important;
+    min-height: 92px !important;
+    border-radius: 50% !important;
+}
+
+
+/* Extra large avatar - edit profile */
+.site-body .candidate-avatar-xl {
+    width: 125px !important;
+    height: 125px !important;
+    min-width: 125px !important;
+    min-height: 125px !important;
+    border-radius: 50% !important;
+}
+
+
+/* Keep dashboard image aligned nicely */
+.site-body .candidate-dashboard-person {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+
+/* Profile summary alignment */
+.site-body .candidate-profile-summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+
+/* Mobile */
+@media (max-width: 576px) {
+
+    .site-body .candidate-avatar-lg {
+        width: 78px !important;
+        height: 78px !important;
+        min-width: 78px !important;
+        min-height: 78px !important;
+    }
+
+    .site-body .candidate-avatar-xl {
+        width: 105px !important;
+        height: 105px !important;
+        min-width: 105px !important;
+        min-height: 105px !important;
+    }
+}
+/* Hide candidate initial when profile image is present */
+.candidate-avatar:has(.candidate-avatar-image) .candidate-avatar-fallback {
+    display: none !important;
+}

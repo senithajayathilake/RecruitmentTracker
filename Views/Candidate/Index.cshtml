@@ -1,34 +1,205 @@
 @model IEnumerable<Candidate>
+
 @{
     ViewData["Title"] = "Candidates";
 }
+
 <div class="container py-4">
+
     <div class="page-heading">
-        <div><span class="eyebrow">HR · CANDIDATES</span><h1>Candidate management</h1><p>All registered and manually added candidates in one place.</p></div>
-    </div>
-    <div class="content-card">
-        <div class="table-responsive">
-            <table class="table align-middle">
-                <thead><tr><th>Candidate</th><th>Experience</th><th>Skills</th><th>CVs</th><th>Applications</th><th>Status</th><th></th></tr></thead>
-                <tbody>
-                @foreach (var c in Model)
-                {
-                    <tr>
-                        <td><strong>@c.FullName</strong><br><small>@c.Email</small></td>
-                        <td>@c.YearsOfExperience years</td>
-                        <td class="small">@c.Skills</td>
-                        <td>@c.Cvs.Count</td>
-                        <td>@c.Applications.Count</td>
-                        <td><span class="badge @(c.Status == "Hired" ? "text-bg-success" : c.Status == "Rejected" ? "text-bg-danger" : "text-bg-secondary")">@c.Status</span></td>
-                        <td class="text-end"><a asp-action="Details" asp-route-id="@c.CandidateId" class="btn btn-sm btn-light">View</a></td>
-                    </tr>
-                }
-                @if (!Model.Any())
-                {
-                    <tr><td colspan="7" class="text-secondary">No candidates found.</td></tr>
-                }
-                </tbody>
-            </table>
+
+        <div>
+
+            <span class="eyebrow">
+                HR · CANDIDATES
+            </span>
+
+            <h1>
+                Candidate management
+            </h1>
+
+            <p>
+                All registered and manually added candidates in one place.
+            </p>
+
         </div>
+
     </div>
+
+
+    <div class="content-card">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Candidate
+                        </th>
+
+                        <th>
+                            Experience
+                        </th>
+
+                        <th>
+                            Skills
+                        </th>
+
+                        <th>
+                            CVs
+                        </th>
+
+                        <th>
+                            Applications
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @foreach (var c in Model)
+                    {
+                        var initial =
+                        string.IsNullOrWhiteSpace(c.FullName)
+                        ? "?"
+                        : c.FullName.Trim()
+                        .Substring(0, 1)
+                        .ToUpper();
+
+                        var avatarUrl =
+                        Url.Action(
+                        "Avatar",
+                        "Candidate",
+                        new
+                        {
+                            id = c.CandidateId
+                        });
+
+
+                        <tr>
+
+                            <td>
+
+                                <div class="candidate-table-person">
+
+                                    <div class="candidate-avatar candidate-avatar-sm">
+
+                                        <span class="candidate-avatar-fallback">
+                                            @initial
+                                        </span>
+
+                                        <img class="candidate-avatar-image"
+                                             src="@avatarUrl"
+                                             alt="@c.FullName"
+                                             onerror="this.style.display='none';" />
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <strong>
+                                            @c.FullName
+                                        </strong>
+
+                                        <br />
+
+                                        <small>
+                                            @c.Email
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                @c.YearsOfExperience years
+                            </td>
+
+
+                            <td class="small">
+                                @c.Skills
+                            </td>
+
+
+                            <td>
+                                @c.Cvs.Count
+                            </td>
+
+
+                            <td>
+                                @c.Applications.Count
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge @(c.Status == "Hired"
+                                                                          ? "text-bg-success"
+                                                                          : c.Status == "Rejected"
+                                                                              ? "text-bg-danger"
+                                                                              : "text-bg-secondary")">
+
+                                @c.Status
+
+                                </span>
+
+                            </td>
+
+
+                            <td class="text-end">
+
+                                <a asp-action="Details"
+                                   asp-route-id="@c.CandidateId"
+                                   class="btn btn-sm btn-light">
+
+                                    View
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+                                        }
+
+
+                    @if (!Model.Any())
+                    {
+                        <tr>
+
+                            <td colspan="7"
+                                class="text-secondary">
+
+                                No candidates found.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
 </div>
