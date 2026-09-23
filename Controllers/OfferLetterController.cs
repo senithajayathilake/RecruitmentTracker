@@ -41,10 +41,9 @@ public class OfferLetterController : Controller
     // =========================================================
 
     private string OfferFolder =>
-        Path.Combine(
-            _environment.ContentRootPath,
-            "App_Data",
-            "OfferLetters");
+        Environment.GetEnvironmentVariable("OFFER_LETTER_DIRECTORY") is { Length: > 0 } folder
+            ? Path.GetFullPath(folder)
+            : Path.Combine(_environment.ContentRootPath, "App_Data", "OfferLetters");
 
     private string GetOfferPath(int applicationId)
     {

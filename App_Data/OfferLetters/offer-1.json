@@ -1,0 +1,19 @@
+{
+  "ApplicationId": 1,
+  "OfferReference": "HF-2026-0001",
+  "CandidateName": "QA Candidate 1790160798425-96w2r",
+  "CandidateEmail": "qa-1790160798425-96w2r@example.test",
+  "JobTitle": "QA Developer 1790160798425-96w2r",
+  "Department": "QA",
+  "EmploymentType": "Full Time",
+  "Salary": 200000,
+  "Currency": "LKR",
+  "SalaryPeriod": "per month",
+  "StartDate": "2026-10-23T00:00:00",
+  "OfferExpiryDate": "2026-10-07T00:00:00",
+  "WorkLocation": "Colombo",
+  "Notes": null,
+  "IssuedDate": "2026-09-23T10:53:25.4449312Z",
+  "UpdatedDate": "2026-09-23T10:53:25.4449819Z",
+  "IssuedByName": "HR Officer"
+}

@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="QA Automation\" />
     <Folder Include="wwwroot\uploads\avatars\" />
   </ItemGroup>
 
